@@ -58,7 +58,7 @@ export default function HomePageClient({ dataByLocale, defaultLocale }: HomePage
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-0 bg-background min-h-screen lg:h-[calc(100vh-5rem)] lg:overflow-hidden">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12 lg:h-full">
-        <div className="lg:col-span-1 lg:h-full lg:overflow-hidden lg:py-8 lg:pr-8 lg:border-r lg:border-neutral-200/70 dark:lg:border-neutral-800">
+        <div className="lg:col-span-1 lg:h-full lg:overflow-hidden lg:py-8">
           <Profile
             author={data.author}
             social={data.social}

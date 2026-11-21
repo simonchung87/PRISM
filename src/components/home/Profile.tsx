@@ -111,20 +111,20 @@ export default function Profile({ author, social, features, researchInterests }:
             transition={{ duration: 0.6 }}
         >
             {/* Profile Image */}
-            <div className="w-52 h-52 lg:w-56 lg:h-56 mx-auto mb-5 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+            <div className="w-64 h-64 mx-auto mb-6 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
                 <Image
                     src={author.avatar}
                     alt={author.name}
-                    width={224}
-                    height={224}
+                    width={256}
+                    height={256}
                     className="w-full h-full object-cover object-[32%_center]"
                     priority
                 />
             </div>
 
             {/* Name and Title */}
-            <div className="text-center mb-5">
-                <h1 className="text-3xl font-serif font-bold text-primary mb-1.5">
+            <div className="text-center mb-8">
+                <h1 className="text-3xl font-serif font-bold text-primary mb-2">
                     {author.name}
                 </h1>
                 <p className="text-lg text-accent font-medium mb-1">
@@ -136,7 +136,7 @@ export default function Profile({ author, social, features, researchInterests }:
             </div>
 
             {/* Contact Links */}
-            <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-6 relative px-2">
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8 relative px-2">
                 {socialLinks.map((link) => {
                     const IconComponent = link.icon;
                     if (link.isLocation) {

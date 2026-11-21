@@ -448,7 +448,7 @@ export default function PublicationsList({ config, publications, embedded = fals
                                             </div>
                                         ) : (
                                             <p className="text-sm font-medium text-neutral-800 dark:text-neutral-600 mb-3">
-                                                {pub.journal || pub.conference} {pub.year}
+                                                {pub.journal || pub.conference}
                                             </p>
                                         )}
 
@@ -507,6 +507,12 @@ export default function PublicationsList({ config, publications, embedded = fals
                                                     <DocumentTextIcon className="h-3 w-3 mr-1.5" />
                                                     {messages.publications.abstract}
                                                 </button>
+                                            )}
+                                            {!pub.presentation && dateLabel && (
+                                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-neutral-50 dark:bg-neutral-800/70 border border-neutral-200 text-xs font-medium text-neutral-600 tabular-nums">
+                                                    <CalendarIcon className="h-3.5 w-3.5 text-neutral-500 shrink-0" aria-hidden="true" />
+                                                    <span>{dateLabel}</span>
+                                                </div>
                                             )}
                                             {!pub.presentation && pub.doi && (
                                                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-neutral-50 dark:bg-neutral-800/70 border border-neutral-200 text-xs text-neutral-600">
