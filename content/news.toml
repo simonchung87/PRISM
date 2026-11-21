@@ -1,7 +1,27 @@
 [[news]]
+date = "2026-11"
+content = "New technical article series on scientific computing and numerical integrators launched on Medium."
+
+[[news]]
+date = "2026-08"
+content = "Presented our oral talk on adaptive low-rank solvers at SIAM UQ."
+
+[[news]]
+date = "2026-05"
+content = "Released open-source benchmark suite and downloadable paper preprints."
+
+[[news]]
+date = "2026-02"
+content = "Awarded the Graduate Research Fellowship for Excellence in Computational Science."
+
+[[news]]
 date = "2025-11"
 content = "Our work has been accepted by a prestigious journal 🎉"
 
 [[news]]
 date = "2025-09"
 content = "Starting my PhD at the University of Example"
+
+[[news]]
+date = "2025-06"
+content = "Completed summer research internship on stochastic partial differential equations."

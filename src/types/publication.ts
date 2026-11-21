@@ -16,6 +16,8 @@ export type BibTeXInlineNode =
     children: BibTeXInlineNode[];
   };
 
+export type PresentationFormat = 'oral' | 'poster';
+
 export interface Publication {
   id: string;
   title: string;
@@ -40,6 +42,7 @@ export interface Publication {
   keywords?: string[];
   type: PublicationType;
   status: PublicationStatus;
+  presentation?: PresentationFormat;
   citations?: number;
   impactFactor?: number;
   quartile?: 'Q1' | 'Q2' | 'Q3' | 'Q4';

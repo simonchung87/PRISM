@@ -34,9 +34,15 @@ export interface LocaleMessages {
   };
   publications: {
     searchPlaceholder: string;
+    searchWithPresentationPlaceholder: string;
     filters: string;
     year: string;
     type: string;
+    presentation: string;
+    oral: string;
+    poster: string;
+    oralPresentation: string;
+    posterPresentation: string;
     noResults: string;
     abstract: string;
     bibtex: string;
@@ -45,6 +51,7 @@ export interface LocaleMessages {
   footer: {
     lastUpdated: string;
     builtWithPrism: string;
+    modifiedBy: string;
   };
 }
 
@@ -84,9 +91,15 @@ const en: LocaleMessages = {
   },
   publications: {
     searchPlaceholder: 'Search publications...',
+    searchWithPresentationPlaceholder: 'Search by title, author, venue, oral or poster...',
     filters: 'Filters',
     year: 'Year',
     type: 'Type',
+    presentation: 'Presentation',
+    oral: 'Oral',
+    poster: 'Poster',
+    oralPresentation: 'Oral Presentation',
+    posterPresentation: 'Poster Presentation',
     noResults: 'No publications found matching your criteria.',
     abstract: 'Abstract',
     bibtex: 'BibTeX',
@@ -95,62 +108,12 @@ const en: LocaleMessages = {
   footer: {
     lastUpdated: 'Last updated',
     builtWithPrism: 'Built with PRISM',
-  },
-};
-
-const zh: LocaleMessages = {
-  common: {
-    all: '全部',
-    copyToClipboard: '复制到剪贴板',
-  },
-  navigation: {
-    openMainMenu: '打开主菜单',
-  },
-  theme: {
-    system: '跟随系统',
-    light: '浅色',
-    dark: '深色',
-    currentTheme: '当前主题',
-    cycleTheme: '点击切换主题',
-  },
-  profile: {
-    email: '邮箱',
-    location: '地址',
-    workAddress: '办公地址',
-    click: '点击',
-    googleMap: '谷歌地图',
-    send: '发送',
-    sendEmail: '发送邮件',
-    researchInterests: '研究兴趣',
-    like: '点赞',
-    liked: '已点赞',
-    thanks: '感谢支持！',
-  },
-  home: {
-    about: '关于我',
-    news: '动态',
-    selectedPublications: '精选论文',
-    viewAll: '查看全部',
-  },
-  publications: {
-    searchPlaceholder: '搜索论文...',
-    filters: '筛选',
-    year: '年份',
-    type: '类型',
-    noResults: '没有找到符合条件的论文。',
-    abstract: '摘要',
-    bibtex: 'BibTeX',
-    code: '代码',
-  },
-  footer: {
-    lastUpdated: '最近更新',
-    builtWithPrism: '由 PRISM 构建',
+    modifiedBy: 'Modified by Simon',
   },
 };
 
 export const messages: Record<string, LocaleMessages> = {
   en,
-  zh,
 };
 
 export function getMessages(locale: string): LocaleMessages {

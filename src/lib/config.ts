@@ -54,10 +54,27 @@ function normalizeLocale(locale: string): string {
   return locale.trim().replace('_', '-').toLowerCase();
 }
 
+function toPlain<T>(value: T): T {
+  if (value === null || typeof value !== 'object') {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value.map(toPlain) as unknown as T;
+  }
+  if (value instanceof Date) {
+    return new Date(value.getTime()) as unknown as T;
+  }
+  const obj: Record<string, unknown> = {};
+  for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
+    obj[key] = toPlain(val);
+  }
+  return obj as T;
+}
+
 function readConfigFromPath(configPath: string): Partial<SiteConfig> | null {
   try {
     const fileContent = fs.readFileSync(configPath, 'utf-8');
-    return parse(fileContent) as unknown as Partial<SiteConfig>;
+    return toPlain(parse(fileContent)) as unknown as Partial<SiteConfig>;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
       return null;

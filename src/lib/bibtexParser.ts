@@ -1,4 +1,4 @@
-import { Publication, PublicationType, ResearchArea } from '@/types/publication';
+import { PresentationFormat, Publication, PublicationType, ResearchArea } from '@/types/publication';
 import { getConfig } from './config';
 import { getRuntimeI18nConfig } from './i18n/config';
 import { parseBibTeXInline } from './bibtexInline';
@@ -78,22 +78,27 @@ export function parseBibTeX(bibtexContent: string, locale?: string): Publication
       keywords,
       researchArea: detectResearchArea(tags.title, keywords),
 
+      // Determine presentation format (oral / poster)
+      presentation: parsePresentation(tags.presentation),
+
       // Optional fields
       journal: cleanBibTeXString(tags.journal),
       conference: cleanBibTeXString(tags.booktitle),
+      location: cleanBibTeXString(tags.location || tags.address) || undefined,
       volume: tags.volume,
       issue: tags.number,
       pages: tags.pages,
       doi: tags.doi,
       url: tags.url,
+      pdfUrl: resolvePdfUrl(tags.pdf || tags.pdfurl),
       code: tags.code,
-      abstract: cleanBibTeXString(tags.abstract),
-      description: cleanBibTeXString(tags.description || tags.note),
+      abstract: cleanBibTeXParagraphs(tags.abstract),
+      description: cleanBibTeXParagraphs(tags.description || tags.note),
       selected,
       preview,
 
       // Store original BibTeX (excluding custom fields)
-      bibtex: reconstructBibTeX(entry, ['selected', 'preview', 'description', 'keywords', 'code']),
+      bibtex: reconstructBibTeX(entry, ['selected', 'preview', 'description', 'keywords', 'code', 'presentation', 'pdf', 'pdfurl']),
     };
 
     // Clean up undefined fields
@@ -234,6 +239,33 @@ function cleanBibTeXString(str?: string): string {
   if (!str) return '';
 
   return parseBibTeXInline(str).plainText;
+}
+
+function cleanBibTeXParagraphs(str?: string): string {
+  if (!str) return '';
+
+  return parseBibTeXInline(str, { preserveParagraphs: true }).plainText;
+}
+
+function resolvePdfUrl(value?: string): string | undefined {
+  const cleaned = cleanBibTeXString(value).trim();
+  if (!cleaned) return undefined;
+  if (/^(https?:\/\/|\/)/i.test(cleaned)) {
+    return cleaned;
+  }
+  return `/papers/${cleaned}`;
+}
+
+function parsePresentation(value?: string): PresentationFormat | undefined {
+  if (!value) return undefined;
+  const normalized = cleanBibTeXString(value).trim().toLowerCase();
+  if (normalized === 'oral' || normalized === 'oral presentation') {
+    return 'oral';
+  }
+  if (normalized === 'poster' || normalized === 'poster presentation') {
+    return 'poster';
+  }
+  return undefined;
 }
 
 function detectResearchArea(title: string, keywords: string[]): ResearchArea {

@@ -121,6 +121,44 @@ function compactWhitespace(value: string): string {
   return value.replace(/\s+/g, ' ').trim();
 }
 
+function normalizeParagraphWhitespace(value: string): string {
+  const normalized = value
+    .replace(/\r\n?/g, '\n')
+    .replace(/\\par\b\s*/g, '\n\n')
+    .trim();
+
+  if (!normalized) {
+    return '';
+  }
+
+  // First split on explicit blank lines (\n\n+)
+  const rawBlocks = normalized.split(/\n\s*\n+/);
+  const paragraphs: string[] = [];
+
+  for (const block of rawBlocks) {
+    const lines = block
+      .split('\n')
+      .map((line) => line.replace(/[ \t]+/g, ' ').trim())
+      .filter(Boolean);
+
+    if (lines.length === 0) continue;
+
+    // Join lines unless the previous line clearly ends a sentence/paragraph
+    let current = lines[0];
+    for (let i = 1; i < lines.length; i += 1) {
+      if (/[.!?:"'”’)]$/.test(current)) {
+        paragraphs.push(current);
+        current = lines[i];
+      } else {
+        current = `${current} ${lines[i]}`;
+      }
+    }
+    paragraphs.push(current);
+  }
+
+  return paragraphs.join('\n\n');
+}
+
 export function flattenBibTeXInlineNodes(nodes: BibTeXInlineNode[]): string {
   return nodes.map((node) => {
     if (node.type === 'text') {
@@ -130,13 +168,23 @@ export function flattenBibTeXInlineNodes(nodes: BibTeXInlineNode[]): string {
   }).join('');
 }
 
-export function parseBibTeXInline(value?: string): ParsedBibTeXInline {
+export function parseBibTeXInline(
+  value?: string,
+  options?: { preserveParagraphs?: boolean }
+): ParsedBibTeXInline {
   if (!value) {
     return { plainText: '', nodes: [] };
   }
 
-  const parsed = parseNodes(normalizeBibTeXInput(value), 0, false);
-  const plainText = compactWhitespace(flattenBibTeXInlineNodes(parsed.nodes));
+  const preprocessed = options?.preserveParagraphs
+    ? normalizeBibTeXInput(value).replace(/\\par\b\s*/g, '\n\n')
+    : normalizeBibTeXInput(value);
+
+  const parsed = parseNodes(preprocessed, 0, false);
+  const flattened = flattenBibTeXInlineNodes(parsed.nodes);
+  const plainText = options?.preserveParagraphs
+    ? normalizeParagraphWhitespace(flattened)
+    : compactWhitespace(flattened);
 
   return {
     plainText,

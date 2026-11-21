@@ -1,0 +1,6 @@
+type = "blog"
+title = "Blog"
+description = "Technical notes, essays, and research reflections fetched live from Medium."
+medium_username = "Medium"
+platform = "Medium"
+limit = 10

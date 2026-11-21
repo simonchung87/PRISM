@@ -1,0 +1,4 @@
+type = "publication"
+title = "Meeting Abstracts"
+description = "Conference abstracts and scientific meeting presentations, indicating oral talks and poster sessions."
+source = "abstracts.bib"

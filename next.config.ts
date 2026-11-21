@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
+import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 
-const nextConfig: NextConfig = {
-  output: 'export',
+const nextConfig = (phase: string): NextConfig => ({
+  distDir: phase === PHASE_DEVELOPMENT_SERVER ? '.next-dev' : '.next',
+  output: 'standalone',
   trailingSlash: true,
   images: {
     unoptimized: true,
@@ -14,6 +16,6 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
-};
+});
 
 export default nextConfig;

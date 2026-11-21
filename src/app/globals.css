@@ -253,3 +253,39 @@ body {
   /* Soften card borders in dark mode only */
   border-color: rgba(148, 163, 184, 0.24);
 }
+
+/* Standalone scrollbar for News container */
+.news-scrollbar {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--neutral-300) transparent;
+}
+
+.news-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.news-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.news-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--neutral-300);
+  border-radius: 9999px;
+}
+
+.news-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--neutral-400);
+}
+
+.dark .news-scrollbar {
+  scrollbar-color: var(--neutral-600) transparent;
+}
+
+.dark .news-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--neutral-600);
+}
+
+.dark .news-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--neutral-500);
+}

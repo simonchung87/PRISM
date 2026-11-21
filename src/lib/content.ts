@@ -50,6 +50,23 @@ export function getBibtexContent(filename: string, locale?: string): string {
   return readFirstAvailableFile(filename, locale);
 }
 
+function toPlain<T>(value: T): T {
+  if (value === null || typeof value !== 'object') {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value.map(toPlain) as unknown as T;
+  }
+  if (value instanceof Date) {
+    return new Date(value.getTime()) as unknown as T;
+  }
+  const obj: Record<string, unknown> = {};
+  for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
+    obj[key] = toPlain(val);
+  }
+  return obj as T;
+}
+
 export function getTomlContent<T>(filename: string, locale?: string): T | null {
   const content = readFirstAvailableFile(filename, locale);
   if (!content) {
@@ -57,7 +74,7 @@ export function getTomlContent<T>(filename: string, locale?: string): T | null {
   }
 
   try {
-    return parse(content) as unknown as T;
+    return toPlain(parse(content)) as unknown as T;
   } catch (error) {
     console.error(`Error parsing TOML file ${filename}:`, error);
     return null;
