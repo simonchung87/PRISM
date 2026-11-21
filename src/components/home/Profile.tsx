@@ -109,29 +109,28 @@ export default function Profile({ author, social, features, researchInterests }:
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="sticky top-8"
         >
             {/* Profile Image */}
-            <div className="w-64 h-64 mx-auto mb-6 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
+            <div className="w-52 h-52 lg:w-56 lg:h-56 mx-auto mb-5 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105">
                 <Image
                     src={author.avatar}
                     alt={author.name}
-                    width={256}
-                    height={256}
+                    width={224}
+                    height={224}
                     className="w-full h-full object-cover object-[32%_center]"
                     priority
                 />
             </div>
 
             {/* Name and Title */}
-            <div className="text-center mb-6">
-                <h1 className="text-3xl font-serif font-bold text-primary mb-2">
+            <div className="text-center mb-5">
+                <h1 className="text-3xl font-serif font-bold text-primary mb-1.5">
                     {author.name}
                 </h1>
                 <p className="text-lg text-accent font-medium mb-1">
                     {author.title}
                 </p>
-                <p className="text-neutral-600 mb-2">
+                <p className="text-neutral-600 mb-1">
                     {author.institution}
                 </p>
             </div>

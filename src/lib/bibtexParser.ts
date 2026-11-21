@@ -80,6 +80,7 @@ export function parseBibTeX(bibtexContent: string, locale?: string): Publication
 
       // Determine presentation format (oral / poster)
       presentation: parsePresentation(tags.presentation),
+      awards: parseAwards(tags.award || tags.awards),
 
       // Optional fields
       journal: cleanBibTeXString(tags.journal),
@@ -98,7 +99,7 @@ export function parseBibTeX(bibtexContent: string, locale?: string): Publication
       preview,
 
       // Store original BibTeX (excluding custom fields)
-      bibtex: reconstructBibTeX(entry, ['selected', 'preview', 'description', 'keywords', 'code', 'presentation', 'pdf', 'pdfurl']),
+      bibtex: reconstructBibTeX(entry, ['selected', 'preview', 'description', 'keywords', 'code', 'presentation', 'pdf', 'pdfurl', 'award', 'awards']),
     };
 
     // Clean up undefined fields
@@ -266,6 +267,15 @@ function parsePresentation(value?: string): PresentationFormat | undefined {
     return 'poster';
   }
   return undefined;
+}
+
+function parseAwards(value?: string): string[] | undefined {
+  if (!value) return undefined;
+  const items = value
+    .split(/\s*;\s*/)
+    .map((item) => cleanBibTeXString(item).trim())
+    .filter(Boolean);
+  return items.length > 0 ? items : undefined;
 }
 
 function detectResearchArea(title: string, keywords: string[]): ResearchArea {

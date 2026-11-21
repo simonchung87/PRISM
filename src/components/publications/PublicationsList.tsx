@@ -8,10 +8,9 @@ import {
     FunnelIcon,
     CalendarIcon,
     BookOpenIcon,
-    ClipboardDocumentIcon,
     DocumentTextIcon
 } from '@heroicons/react/24/outline';
-import { Download, Mic, Presentation } from 'lucide-react';
+import { Award, Download, ExternalLink, Mic, Presentation } from 'lucide-react';
 import { PresentationFormat, Publication } from '@/types/publication';
 import { PublicationPageConfig } from '@/types/page';
 import { cn } from '@/lib/utils';
@@ -54,7 +53,6 @@ export default function PublicationsList({ config, publications, embedded = fals
     const [selectedType, setSelectedType] = useState<string | 'all'>('all');
     const [selectedPresentation, setSelectedPresentation] = useState<'all' | PresentationFormat>('all');
     const [showFilters, setShowFilters] = useState(false);
-    const [expandedBibtexId, setExpandedBibtexId] = useState<string | null>(null);
     const [expandedAbstractId, setExpandedAbstractId] = useState<string | null>(null);
 
     // Extract unique years, types, and presentation formats for filters
@@ -99,6 +97,8 @@ export default function PublicationsList({ config, publications, embedded = fals
                 pub.journal?.toLowerCase().includes(query) ||
                 pub.conference?.toLowerCase().includes(query) ||
                 pub.location?.toLowerCase().includes(query) ||
+                pub.doi?.toLowerCase().includes(query) ||
+                pub.awards?.some(award => award.toLowerCase().includes(query)) ||
                 String(pub.year).includes(query) ||
                 presentationSearchText.includes(query);
 
@@ -342,6 +342,7 @@ export default function PublicationsList({ config, publications, embedded = fals
                     filteredPublications.map((pub, index) => {
                         const venueName = pub.conference || pub.journal;
                         const dateLabel = formatDateLabel(pub.month, pub.year);
+                        const doiHref = pub.doi ? `https://doi.org/${pub.doi}` : null;
 
                         return (
                             <motion.div
@@ -358,7 +359,7 @@ export default function PublicationsList({ config, publications, embedded = fals
                                                 "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide whitespace-nowrap shrink-0",
                                                 pub.presentation === 'oral'
                                                     ? "bg-accent/15 text-accent-dark dark:text-accent border border-accent/30"
-                                                    : "bg-neutral-100 dark:bg-neutral-800 text-primary dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700"
+                                                    : "bg-neutral-100 text-primary border border-neutral-200"
                                             )}
                                         >
                                             {pub.presentation === 'oral' ? (
@@ -394,7 +395,24 @@ export default function PublicationsList({ config, publications, embedded = fals
                                     )}
                                     <div className="flex-grow">
                                         <h3 className={`${embedded ? "text-lg" : "text-xl"} font-semibold text-primary mb-2 leading-tight`}>
-                                            <FormattedBibTeXText nodes={pub.titleNodes} fallback={pub.title} />
+                                            {doiHref ? (
+                                                <a
+                                                    href={doiHref}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="group inline-flex items-baseline gap-1.5 hover:text-accent transition-colors"
+                                                >
+                                                    <span>
+                                                        <FormattedBibTeXText nodes={pub.titleNodes} fallback={pub.title} />
+                                                    </span>
+                                                    <ExternalLink
+                                                        className="h-3.5 w-3.5 shrink-0 self-center text-neutral-400 group-hover:text-accent transition-colors"
+                                                        aria-hidden="true"
+                                                    />
+                                                </a>
+                                            ) : (
+                                                <FormattedBibTeXText nodes={pub.titleNodes} fallback={pub.title} />
+                                            )}
                                         </h3>
                                         <p className={`${embedded ? "text-sm" : "text-base"} text-neutral-600 dark:text-neutral-400 mb-2`}>
                                             {pub.authors.map((author, idx) => (
@@ -421,19 +439,25 @@ export default function PublicationsList({ config, publications, embedded = fals
                                                         {pub.location}
                                                     </span>
                                                 )}
-                                                {(venueName || pub.location) && dateLabel && (
-                                                    <span aria-hidden="true" className="text-neutral-400">·</span>
-                                                )}
-                                                {dateLabel && (
-                                                    <span className="text-neutral-500 dark:text-neutral-400 font-normal tabular-nums">
-                                                        {dateLabel}
-                                                    </span>
-                                                )}
                                             </div>
                                         ) : (
                                             <p className="text-sm font-medium text-neutral-800 dark:text-neutral-600 mb-3">
                                                 {pub.journal || pub.conference} {pub.year}
                                             </p>
+                                        )}
+
+                                        {!pub.presentation && pub.doi && (
+                                            <div className="mb-3 px-3 py-1.5 rounded-md bg-neutral-50 dark:bg-neutral-800/70 border border-neutral-200 text-xs text-neutral-600 flex flex-wrap items-center gap-2">
+                                                <span className="font-semibold text-primary">DOI</span>
+                                                <span className="font-mono select-all break-all">{pub.doi}</span>
+                                            </div>
+                                        )}
+
+                                        {pub.awards && pub.awards.length > 0 && (
+                                            <div className="mb-3 px-3 py-2 rounded-lg bg-accent/10 border border-accent/25 text-xs font-medium text-primary flex items-center gap-2">
+                                                <Award className="h-4 w-4 text-accent shrink-0" aria-hidden="true" />
+                                                <span>{pub.awards.join(' · ')}</span>
+                                            </div>
                                         )}
 
                                         {pub.description && (
@@ -455,16 +479,6 @@ export default function PublicationsList({ config, publications, embedded = fals
                                                 >
                                                     <Download className="h-3 w-3 mr-1.5" aria-hidden="true" />
                                                     PDF
-                                                </a>
-                                            )}
-                                            {pub.doi && (
-                                                <a
-                                                    href={`https://doi.org/${pub.doi}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-accent hover:text-white transition-colors"
-                                                >
-                                                    DOI
                                                 </a>
                                             )}
                                             {pub.url && !pub.doi && (
@@ -502,21 +516,6 @@ export default function PublicationsList({ config, publications, embedded = fals
                                                     {messages.publications.abstract}
                                                 </button>
                                             )}
-                                            {pub.bibtex && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setExpandedBibtexId(expandedBibtexId === pub.id ? null : pub.id)}
-                                                    className={cn(
-                                                        "inline-flex items-center px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer",
-                                                        expandedBibtexId === pub.id
-                                                            ? "bg-accent text-white"
-                                                            : "bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-accent hover:text-white"
-                                                    )}
-                                                >
-                                                    <BookOpenIcon className="h-3 w-3 mr-1.5" />
-                                                    {messages.publications.bibtex}
-                                                </button>
-                                            )}
                                         </div>
 
                                         <AnimatePresence>
@@ -534,31 +533,6 @@ export default function PublicationsList({ config, publications, embedded = fals
                                                                 {paragraph}
                                                             </p>
                                                         ))}
-                                                    </div>
-                                                </motion.div>
-                                            ) : null}
-                                            {expandedBibtexId === pub.id && pub.bibtex ? (
-                                                <motion.div
-                                                    key="bibtex"
-                                                    initial={{ opacity: 0, height: 0 }}
-                                                    animate={{ opacity: 1, height: 'auto' }}
-                                                    exit={{ opacity: 0, height: 0 }}
-                                                    className="overflow-hidden mt-4"
-                                                >
-                                                    <div className="relative bg-neutral-50 dark:bg-neutral-800 rounded-lg p-4 border border-neutral-200 dark:border-neutral-700">
-                                                        <pre className="text-xs text-neutral-600 dark:text-neutral-500 overflow-x-auto whitespace-pre-wrap font-mono">
-                                                            {pub.bibtex}
-                                                        </pre>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => {
-                                                                navigator.clipboard.writeText(pub.bibtex || '');
-                                                            }}
-                                                            className="absolute top-2 right-2 p-1.5 rounded-md bg-white dark:bg-neutral-700 text-neutral-500 hover:text-accent shadow-sm border border-neutral-200 dark:border-neutral-600 transition-colors cursor-pointer"
-                                                            title={messages.common.copyToClipboard}
-                                                        >
-                                                            <ClipboardDocumentIcon className="h-4 w-4" />
-                                                        </button>
                                                     </div>
                                                 </motion.div>
                                             ) : null}

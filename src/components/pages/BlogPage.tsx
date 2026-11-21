@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, BookOpen, RefreshCw } from 'lucide-react';
+import { ArrowUpRight, RefreshCw } from 'lucide-react';
 import { BlogPageConfig } from '@/types/page';
 
 interface MediumArticle {
@@ -37,69 +37,52 @@ export default function BlogPage({
   config: BlogPageConfig;
   embedded?: boolean;
 }) {
-  const defaultHandle = (config.medium_username || '').replace(/^@/, '');
+  const configuredHandle = (config.medium_username || '').trim().replace(/^@/, '');
   const platformName = config.platform || 'Medium';
   const limit = config.limit || 10;
 
-  const [activeUsername, setActiveUsername] = useState(defaultHandle);
-  const [inputUsername, setInputUsername] = useState(defaultHandle);
   const [articles, setArticles] = useState<MediumArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadArticles = useCallback(
-    async (usernameToFetch: string) => {
-      const cleaned = usernameToFetch.trim().replace(/^@/, '');
-      if (!cleaned) {
+  const loadArticles = useCallback(async () => {
+    if (!configuredHandle) {
+      setArticles([]);
+      setError('No Medium username configured in blog settings.');
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const params = new URLSearchParams({
+        username: configuredHandle,
+        platform: platformName,
+        limit: String(limit),
+      });
+      const response = await fetch(`/api/medium/?${params.toString()}`);
+      const data = await response.json();
+
+      if (!response.ok) {
         setArticles([]);
-        setError('No Medium username configured yet.');
-        setLoading(false);
+        setError(data.error || `Could not load ${platformName} articles for @${configuredHandle}.`);
         return;
       }
 
-      setLoading(true);
-      setError(null);
-
-      try {
-        const params = new URLSearchParams({
-          username: cleaned,
-          platform: platformName,
-          limit: String(limit),
-        });
-        const response = await fetch(`/api/medium/?${params.toString()}`);
-        const data = await response.json();
-
-        if (!response.ok) {
-          setArticles([]);
-          setError(data.error || `Could not load Medium articles for @${cleaned}.`);
-          return;
-        }
-
-        setArticles(Array.isArray(data.articles) ? data.articles : []);
-      } catch {
-        setArticles([]);
-        setError(`Failed to fetch Medium feed for @${cleaned}.`);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [limit, platformName]
-  );
+      setArticles(Array.isArray(data.articles) ? data.articles : []);
+    } catch {
+      setArticles([]);
+      setError(`Failed to fetch ${platformName} feed for @${configuredHandle}.`);
+    } finally {
+      setLoading(false);
+    }
+  }, [configuredHandle, limit, platformName]);
 
   useEffect(() => {
-    loadArticles(activeUsername);
-  }, [activeUsername, loadArticles]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const cleaned = inputUsername.trim().replace(/^@/, '');
-    if (!cleaned) return;
-    if (cleaned === activeUsername) {
-      loadArticles(cleaned);
-    } else {
-      setActiveUsername(cleaned);
-    }
-  };
+    loadArticles();
+  }, [loadArticles]);
 
   return (
     <motion.div
@@ -117,40 +100,6 @@ export default function BlogPage({
           </p>
         )}
       </div>
-
-      {/* Live Medium Feed Source Bar */}
-      <form
-        onSubmit={handleSubmit}
-        className="mb-8 flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/60 dark:bg-neutral-900/60"
-      >
-        <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 shrink-0">
-          <BookOpen className="h-4 w-4 text-accent" aria-hidden="true" />
-          <span className="font-medium text-primary">{platformName} Feed</span>
-        </div>
-        <div className="flex flex-grow items-center gap-2">
-          <div className="relative flex-grow">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-neutral-400 select-none">
-              @
-            </span>
-            <input
-              type="text"
-              value={inputUsername}
-              onChange={(e) => setInputUsername(e.target.value)}
-              placeholder="Medium username"
-              aria-label="Medium username"
-              className="w-full pl-7 pr-3 py-1.5 text-sm rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-primary focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent-dark transition-colors disabled:opacity-60 whitespace-nowrap shrink-0 cursor-pointer"
-          >
-            <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} aria-hidden="true" />
-            Load Feed
-          </button>
-        </div>
-      </form>
 
       {/* Loading State */}
       {loading && (
@@ -173,7 +122,7 @@ export default function BlogPage({
           <p className="text-sm text-neutral-600 dark:text-neutral-400">{error}</p>
           <button
             type="button"
-            onClick={() => loadArticles(activeUsername)}
+            onClick={loadArticles}
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-primary hover:bg-accent hover:text-white transition-colors cursor-pointer"
           >
             <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
@@ -185,7 +134,7 @@ export default function BlogPage({
       {/* Empty State */}
       {!loading && !error && articles.length === 0 && (
         <div className="p-8 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-center text-sm text-neutral-500">
-          No published articles found for @{activeUsername} on {platformName}.
+          No published articles found for @{configuredHandle} on {platformName}.
         </div>
       )}
 

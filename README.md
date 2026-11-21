@@ -4,7 +4,7 @@
 
 # PRISM
 
-**English** · [中文](README_cn.md) · [Demo](https://prism-demo.pages.dev)  · [Changelog](CHANGELOG.md)
+**English** · [Changelog](#changelog)
 
 **If you like this project, please give it a star ⭐️**
 
@@ -16,12 +16,12 @@ Feel free to customize your own version of PRISM with coding agents.
 
 ## ✨ Features
 
-*   **📄 Configuration-Driven**: Manage your site's content using `TOML`, `Markdown`, and `BibTeX` files in the `content/` directory.
-*   **📚 BibTeX Publications & Meeting Abstracts**: Render peer-reviewed papers and conference/meeting abstracts directly from `.bib` files with search, Year/Type/Presentation filtering, copyable BibTeX citations, downloadable PDFs, and multi-paragraph abstract formatting.
-*   **🎤 Oral & Poster Presentation Indicators**: Mark meeting abstracts with `presentation = {oral}` or `presentation = {poster}` to display a dedicated presentation header badge, structured venue/location metadata, and `All / Oral / Poster` filtering.
-*   **✍️ Live Medium Blog Integration**: Dedicated **Blog** page (`/blog`) that fetches articles live from a Medium `@username` RSS feed via a server-side API route, displaying clickable article titles, publication dates/times, and platform labels.
-*   **📰 Scrollable News Section**: Bounded-height News container with a standalone scrollbar on the About page so long update histories stay compact.
-*   **🎨 Modern Design**: Clean, responsive UI with serif/sans-serif typography pairing, Framer Motion animations, Dark Mode support, and an English-only layout.
+*   **📄 Configuration-Driven**: Manage your site's content using `TOML`, `Markdown`, and `BibTeX` files in the `content/` directory (English-only).
+*   **📚 BibTeX Publications & Meeting Abstracts**: Render peer-reviewed papers and conference/meeting abstracts from `.bib` files with search, Year/Type/Presentation filtering, clickable DOI-linked titles, inline DOI display (on publications), downloadable PDFs, and multi-paragraph abstract formatting.
+*   **🎤 Oral, Poster & Award Indicators**: Mark meeting abstracts with `presentation = {oral}` or `presentation = {poster}` and `award = {...}` to display a presentation header badge (with single date placement), structured venue/location metadata, dedicated award callout rows, and `All / Oral / Poster` filtering.
+*   **✍️ Live Medium Blog Integration**: Dedicated **Blog** page (`/blog`) that automatically fetches and renders articles live from your configured `medium_username` in `content/blog.toml` via `/api/medium/`, displaying clickable article titles, publication dates/times, and platform labels.
+*   **🖥️ Desktop Split-Pane About Layout & Scrollable News**: On desktop screens, the About page keeps the left profile panel fixed and non-scrollable while the right content column (Bio, Selected Publications, and News) scrolls independently, with a dedicated bounded scrollbar on the News section.
+*   **🎨 Modern Design**: Clean, responsive UI with serif/sans-serif typography pairing, Framer Motion animations, Dark Mode support, and customized footer attribution (`Built with PRISM - Modified by Simon`).
 *   **⚡️ Next.js Standalone Server**: Built on Next.js 15 with App Router and `output: 'standalone'` to support server-side API routes cleanly.
 
 ## 🚀 Getting Started
@@ -87,11 +87,11 @@ persist = false
 switcher = false
 ```
 
-### 2. Homepage & Scrollable News (`content/about.toml` & `content/news.toml`)
-Customize the "About" section, "Selected Publications", and "News" on the homepage.
+### 2. Desktop Split-Pane Homepage & Scrollable News (`content/about.toml` & `content/news.toml`)
+Customize the "About" section, "Selected Publications", and "News" on the homepage:
 
-*   Add entries to `content/news.toml` using `[[news]]` blocks (`date` and `content`).
-*   The **News** section renders inside a bounded-height container (`max-h-60`) with a standalone vertical scrollbar so long lists do not stretch the About page.
+*   **Desktop Split Layout**: On `lg:` desktop viewports, the left column (avatar, name, contact links, research interests, and like button) remains fixed and non-scrollable, while the right column (Bio, Selected Publications, and News) scrolls independently. On smaller screens, both columns stack normally.
+*   **Scrollable News**: Add entries to `content/news.toml` using `[[news]]` blocks (`date` and `content`). The **News** section renders inside a bounded-height container (`max-h-60`) with a standalone vertical scrollbar so long histories stay compact.
 
 ```toml
 [[news]]
@@ -99,14 +99,13 @@ date = "2026-11"
 content = "New article series published on Medium."
 ```
 
-### 3. Publications, PDFs & Multi-Paragraph Abstracts (`content/publications.bib`)
-Export your publications to `content/publications.bib`. Supported custom BibTeX fields:
+### 3. Publications, DOI Links, PDFs & Multi-Paragraph Abstracts (`content/publications.bib`)
+Export your publications to `content/publications.bib`. Supported BibTeX fields and card behaviors:
 
-*   `pdf = {filename.pdf}` or `pdf = {https://example.com/paper.pdf}`: Adds a downloadable **PDF** button to the entry card. Place local PDF files in `public/papers/` and reference them by filename (e.g., `pdf = {sample-paper.pdf}`), or provide a root-relative path (`/pdfs/...`) or external URL.
-*   `abstract = {...}`: Separate paragraphs with blank lines or `\par`. Multi-paragraph abstracts (and descriptions) are preserved and rendered as spaced `<p>` paragraphs rather than collapsed into a single block.
-*   `selected = {true}`, `preview = {example.png}`, `code = {https://...}`, `description = {...}`: Optional display helpers (all custom tags are automatically excluded from copyable BibTeX citations).
-
-Inline BibTeX formatting commands (`\textit{}`, `\emph{}`, `\textbf{}`, `\textsc{}`, `\textsuperscript{}`, `\textsubscript{}`) are also supported in titles and text fields.
+*   **Clickable Title & Inline DOI Display**: When `doi = {...}` is set on a publication entry, the card title links directly to `https://doi.org/<doi>`, and a dedicated **DOI** row inside the card displays the DOI string. (The inline DOI section is automatically hidden whenever `presentation` is present, such as on Meeting Abstracts, and standalone `DOI` / `BibTeX` buttons have been removed.)
+*   **Downloadable PDFs**: Set `pdf = {filename.pdf}` or `pdf = {https://example.com/paper.pdf}` to show a **PDF** download button on the entry card. Place local PDF files in `public/papers/` and reference them by filename (e.g., `pdf = {sample-paper.pdf}`), or provide a root-relative path or external URL.
+*   **Multi-Paragraph Abstracts**: Separate paragraphs in `abstract = {...}` or `description = {...}` with blank lines or `\par` to render spaced `<p>` paragraphs.
+*   **Additional Helpers**: `selected = {true}`, `preview = {example.png}`, `code = {https://...}`, and inline BibTeX formatting commands (`\textit{}`, `\emph{}`, `\textbf{}`, `\textsc{}`, `\textsuperscript{}`, `\textsubscript{}`).
 
 ### 4. Meeting Abstracts (`content/abstracts.toml` & `content/abstracts.bib`)
 Create dedicated conference or meeting abstract pages using `type = "publication"` in `content/abstracts.toml`:
@@ -118,7 +117,7 @@ description = "Conference abstracts and scientific meeting presentations, indica
 source = "abstracts.bib"
 ```
 
-In `content/abstracts.bib`, add `presentation = {oral}` or `presentation = {poster}` (alongside `booktitle`, `address`/`location`, `month`, `year`, and optional `pdf`):
+In `content/abstracts.bib`, add `presentation = {oral}` or `presentation = {poster}` alongside `booktitle`, `address`/`location`, `month`, `year`, and optional `award` / `pdf`:
 
 ```bibtex
 @inproceedings{example2025,
@@ -129,6 +128,7 @@ In `content/abstracts.bib`, add `presentation = {oral}` or `presentation = {post
   month = mar,
   address = {Boston, MA, USA},
   presentation = {oral},
+  award = {Best Student Oral Presentation Award},
   pdf = {sample-paper.pdf},
   abstract = {First paragraph of the abstract.
 
@@ -137,12 +137,14 @@ Second paragraph of the abstract.}
 ```
 
 Entries with `presentation` automatically display:
-*   A prominent **Oral Presentation** or **Poster Presentation** header badge and date.
-*   A structured venue metadata row (`Conference · Location · Date`).
-*   **All / Oral / Poster** filter controls next to the search bar and inside the **Filters** panel, plus text search matching `"oral"`, `"poster"`, title, author, venue, and location.
+*   A prominent **Oral Presentation** or **Poster Presentation** header badge with the date shown once on the right of the header bar.
+*   A structured venue metadata row (`Conference · Location`) without duplicating the date.
+*   A dedicated **Award** callout row when `award` or `awards` is present (supports multiple awards separated by `;`).
+*   **All / Oral / Poster** filter controls next to the search bar and inside the **Filters** panel, plus text search matching `"oral"`, `"poster"`, award names, title, author, venue, and location.
+*   The inline DOI box is automatically disabled/hidden when `presentation` is set.
 
 ### 5. Medium Blog Page (`content/blog.toml`)
-Add a **Blog** page backed by a Medium RSS feed by setting `type = "blog"` in `content/blog.toml` and adding it to `[[navigation]]` in `content/config.toml`:
+Add a **Blog** page backed by your Medium RSS feed by setting `type = "blog"` in `content/blog.toml` and adding it to `[[navigation]]` in `content/config.toml`:
 
 ```toml
 type = "blog"
@@ -153,16 +155,15 @@ platform = "Medium"
 limit = 10
 ```
 
-*   Articles are fetched live from `https://medium.com/feed/@<username>` through the server-side `/api/medium/` route (avoiding browser CORS issues).
+*   Articles are fetched automatically on page load from `https://medium.com/feed/@<medium_username>` via the server-side `/api/medium/` route (avoiding browser CORS issues), with no search or handle input bar shown on the page.
 *   Each card shows the clickable article title (linking directly to Medium), publication date/time, and platform label (`Medium`).
-*   Visitors can also enter another `@username` in the feed bar on `/blog` to preview any public Medium feed.
 
 ### 6. Adding Other Custom Pages
 Create a `.toml` file in `content/` and add an entry to `[[navigation]]` in `content/config.toml`. Supported page types:
 *   `text`: Renders Markdown content (e.g., CVs, Bio).
 *   `card`: Renders a list of Markdown-capable cards (e.g., Projects, Awards, Services, Teaching).
 *   `publication`: Renders BibTeX-backed Publications or Meeting Abstracts lists with search and filters.
-*   `blog`: Fetches and renders live articles from a Medium RSS feed.
+*   `blog`: Automatically fetches and renders live articles from the configured Medium RSS feed.
 
 ## 📦 Deployment
 
@@ -186,14 +187,39 @@ PRISM/
 │   ├── app/
 │   │   ├── api/medium/   # Server-side Medium RSS feed proxy route
 │   │   ├── [slug]/       # Dynamic subpages (/publications, /abstracts, /blog, etc.)
-│   │   └── page.tsx      # Homepage (About, Selected Publications, Scrollable News)
+│   │   └── page.tsx      # Homepage (Fixed Profile + Scrollable Bio/Publications/News)
 │   ├── components/       # UI components (PublicationsList, BlogPage, News, Footer, etc.)
 │   ├── lib/              # BibTeX/TOML parsers, config loaders, and stores
 │   └── types/            # TypeScript definitions
 └── next.config.ts        # Next.js configuration (standalone output)
 ```
 
+<a id="changelog"></a>
+## 📝 Changelog
+
+For full release history, see [CHANGELOG.md](CHANGELOG.md).
+
+### Recent Customizations (Modified by Simon)
+*   **Desktop About Layout**: Separated the desktop About page into a fixed, non-scrollable left profile column and an independently scrollable right content column (`Bio`, `Selected Publications`, and `News`).
+*   **Publications Cards & DOI Behavior**:
+    *   Linked each publication title directly to `https://doi.org/<doi>` when a DOI is present.
+    *   Added a dedicated inline **DOI** section inside each publication card (automatically disabled/hidden when `presentation` is set).
+    *   Removed the `DOI` and `BibTeX` action buttons and the expandable BibTeX drawer from cards.
+    *   Added `pdf` BibTeX field support for downloadable local (`public/papers/`) or external PDF attachments.
+    *   Preserved `\par`, blank lines, and line breaks as spaced paragraphs for multi-paragraph abstracts and descriptions.
+*   **Meeting Abstracts Page**:
+    *   Added support for `presentation = {oral}` and `presentation = {poster}` badges with `All / Oral / Poster` filtering.
+    *   Removed the duplicate date next to the conference name so the date appears once in the top presentation header bar.
+    *   Added BibTeX `award` / `awards` parsing (semicolon-separated) and a dedicated Award callout row inside each card.
+*   **Medium Blog Page**:
+    *   Added a dedicated `/blog` page powered by a server-side Medium RSS feed API route (`/api/medium/`), displaying clickable titles, publication dates/times, and platform labels.
+    *   Removed the Medium username search bar so the page cleanly loads only the `medium_username` configured in `content/blog.toml`.
+*   **Homepage News & Site Updates**:
+    *   Added a bounded-height News container (`max-h-60`) with a standalone vertical scrollbar on the About page.
+    *   Removed the Chinese localization (`content_zh` and Chinese UI strings) to keep the site English-only.
+    *   Updated footer attribution to `Built with PRISM - Modified by Simon`.
+    *   Cleaned up `README.md` (removed Chinese and Demo links) and configured Next.js standalone server runtime for Node.js/API routes.
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
