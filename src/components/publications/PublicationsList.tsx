@@ -7,7 +7,6 @@ import {
     MagnifyingGlassIcon,
     FunnelIcon,
     CalendarIcon,
-    BookOpenIcon,
     DocumentTextIcon
 } from '@heroicons/react/24/outline';
 import { Award, Download, ExternalLink, Mic, Presentation } from 'lucide-react';
@@ -50,20 +49,14 @@ export default function PublicationsList({ config, publications, embedded = fals
     const messages = useMessages();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedYear, setSelectedYear] = useState<number | 'all'>('all');
-    const [selectedType, setSelectedType] = useState<string | 'all'>('all');
     const [selectedPresentation, setSelectedPresentation] = useState<'all' | PresentationFormat>('all');
     const [showFilters, setShowFilters] = useState(false);
     const [expandedAbstractId, setExpandedAbstractId] = useState<string | null>(null);
 
-    // Extract unique years, types, and presentation formats for filters
+    // Extract unique years and presentation formats for filters
     const years = useMemo(() => {
         const uniqueYears = Array.from(new Set(publications.map(p => p.year)));
         return uniqueYears.sort((a, b) => b - a);
-    }, [publications]);
-
-    const types = useMemo(() => {
-        const uniqueTypes = Array.from(new Set(publications.map(p => p.type)));
-        return uniqueTypes.sort();
     }, [publications]);
 
     const presentations = useMemo(() => {
@@ -103,17 +96,15 @@ export default function PublicationsList({ config, publications, embedded = fals
                 presentationSearchText.includes(query);
 
             const matchesYear = selectedYear === 'all' || pub.year === selectedYear;
-            const matchesType = selectedType === 'all' || pub.type === selectedType;
             const matchesPresentation =
                 selectedPresentation === 'all' || pub.presentation === selectedPresentation;
 
-            return matchesSearch && matchesYear && matchesType && matchesPresentation;
+            return matchesSearch && matchesYear && matchesPresentation;
         });
     }, [
         publications,
         searchQuery,
         selectedYear,
-        selectedType,
         selectedPresentation,
         messages.publications.oral,
         messages.publications.oralPresentation,
@@ -252,80 +243,6 @@ export default function PublicationsList({ config, publications, embedded = fals
                                         ))}
                                     </div>
                                 </div>
-
-                                {/* Type Filter */}
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center">
-                                        <BookOpenIcon className="h-4 w-4 mr-1" /> {messages.publications.type}
-                                    </label>
-                                    <div className="flex flex-wrap gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => setSelectedType('all')}
-                                            className={cn(
-                                                "px-3 py-1 text-xs rounded-full transition-colors cursor-pointer",
-                                                selectedType === 'all'
-                                                    ? "bg-accent text-white"
-                                                    : "bg-white dark:bg-neutral-800 text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                                            )}
-                                        >
-                                            {messages.common.all}
-                                        </button>
-                                        {types.map(type => (
-                                            <button
-                                                type="button"
-                                                key={type}
-                                                onClick={() => setSelectedType(type)}
-                                                className={cn(
-                                                    "px-3 py-1 text-xs rounded-full capitalize transition-colors cursor-pointer",
-                                                    selectedType === type
-                                                        ? "bg-accent text-white"
-                                                        : "bg-white dark:bg-neutral-800 text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                                                )}
-                                            >
-                                                {type.replace('-', ' ')}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Presentation Filter */}
-                                {hasPresentations && (
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center">
-                                            <Presentation className="h-4 w-4 mr-1" /> {messages.publications.presentation}
-                                        </label>
-                                        <div className="flex flex-wrap gap-2">
-                                            <button
-                                                type="button"
-                                                onClick={() => setSelectedPresentation('all')}
-                                                className={cn(
-                                                    "px-3 py-1 text-xs rounded-full transition-colors cursor-pointer",
-                                                    selectedPresentation === 'all'
-                                                        ? "bg-accent text-white"
-                                                        : "bg-white dark:bg-neutral-800 text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                                                )}
-                                            >
-                                                {messages.common.all}
-                                            </button>
-                                            {presentations.map(format => (
-                                                <button
-                                                    type="button"
-                                                    key={format}
-                                                    onClick={() => setSelectedPresentation(format)}
-                                                    className={cn(
-                                                        "px-3 py-1 text-xs rounded-full transition-colors cursor-pointer inline-flex items-center gap-1.5",
-                                                        selectedPresentation === format
-                                                            ? "bg-accent text-white"
-                                                            : "bg-white dark:bg-neutral-800 text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                                                    )}
-                                                >
-                                                    {format === 'oral' ? messages.publications.oral : messages.publications.poster}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
                             </div>
                         </motion.div>
                     )}
@@ -354,23 +271,31 @@ export default function PublicationsList({ config, publications, embedded = fals
                             >
                                 {pub.presentation && (
                                     <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-4 border-b border-neutral-100 dark:border-neutral-800">
-                                        <span
-                                            className={cn(
-                                                "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide whitespace-nowrap shrink-0",
-                                                pub.presentation === 'oral'
-                                                    ? "bg-accent/15 text-accent-dark dark:text-accent border border-accent/30"
-                                                    : "bg-neutral-100 text-primary border border-neutral-200"
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <span
+                                                className={cn(
+                                                    "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide whitespace-nowrap shrink-0",
+                                                    pub.presentation === 'oral'
+                                                        ? "bg-accent/15 text-accent-dark dark:text-accent border border-accent/30"
+                                                        : "bg-neutral-100 text-primary border border-neutral-200"
+                                                )}
+                                            >
+                                                {pub.presentation === 'oral' ? (
+                                                    <Mic className="h-3.5 w-3.5" aria-hidden="true" />
+                                                ) : (
+                                                    <Presentation className="h-3.5 w-3.5" aria-hidden="true" />
+                                                )}
+                                                {pub.presentation === 'oral'
+                                                    ? messages.publications.oralPresentation
+                                                    : messages.publications.posterPresentation}
+                                            </span>
+                                            {pub.awards && pub.awards.length > 0 && (
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-accent/10 border border-accent/25 text-xs font-medium text-primary">
+                                                    <Award className="h-3.5 w-3.5 text-accent shrink-0" aria-hidden="true" />
+                                                    <span>{pub.awards.join(' · ')}</span>
+                                                </span>
                                             )}
-                                        >
-                                            {pub.presentation === 'oral' ? (
-                                                <Mic className="h-3.5 w-3.5" aria-hidden="true" />
-                                            ) : (
-                                                <Presentation className="h-3.5 w-3.5" aria-hidden="true" />
-                                            )}
-                                            {pub.presentation === 'oral'
-                                                ? messages.publications.oralPresentation
-                                                : messages.publications.posterPresentation}
-                                        </span>
+                                        </div>
                                         {dateLabel && (
                                             <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400 tabular-nums">
                                                 {dateLabel}
@@ -414,7 +339,7 @@ export default function PublicationsList({ config, publications, embedded = fals
                                                 <FormattedBibTeXText nodes={pub.titleNodes} fallback={pub.title} />
                                             )}
                                         </h3>
-                                        {pub.awards && pub.awards.length > 0 && (
+                                        {!pub.presentation && pub.awards && pub.awards.length > 0 && (
                                             <div className="mb-2.5 px-3 py-1.5 rounded-lg bg-accent/10 border border-accent/25 text-xs font-medium text-primary inline-flex items-center gap-2">
                                                 <Award className="h-3.5 w-3.5 text-accent shrink-0" aria-hidden="true" />
                                                 <span>{pub.awards.join(' · ')}</span>
