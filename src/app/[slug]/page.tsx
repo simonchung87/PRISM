@@ -13,8 +13,9 @@ import {
 
 import { Metadata } from 'next';
 import { getRuntimeI18nConfig } from '@/lib/i18n/config';
+import { fetchMediumArticles } from '@/lib/medium';
 
-function loadDynamicPageData(slug: string, locale?: string): DynamicPageLocaleData | null {
+async function loadDynamicPageData(slug: string, locale?: string): Promise<DynamicPageLocaleData | null> {
   const pageConfig = getPageConfig(slug, locale) as BasePageConfig | null;
 
   if (!pageConfig) {
@@ -49,9 +50,16 @@ function loadDynamicPageData(slug: string, locale?: string): DynamicPageLocaleDa
   }
 
   if (pageConfig.type === 'blog') {
+    const blogConfig = pageConfig as BlogPageConfig;
+    const { articles } = await fetchMediumArticles(
+      blogConfig.medium_username,
+      blogConfig.platform,
+      blogConfig.limit
+    );
     return {
       type: 'blog',
-      config: pageConfig as BlogPageConfig,
+      config: blogConfig,
+      articles,
     };
   }
 
@@ -91,13 +99,13 @@ export default async function DynamicPage({ params }: { params: Promise<{ slug: 
   const dataByLocale: Record<string, DynamicPageLocaleData> = {};
 
   for (const locale of targetLocales) {
-    const localizedData = loadDynamicPageData(slug, locale);
+    const localizedData = await loadDynamicPageData(slug, locale);
     if (localizedData) {
       dataByLocale[locale] = localizedData;
     }
   }
 
-  const defaultData = loadDynamicPageData(slug);
+  const defaultData = await loadDynamicPageData(slug);
   if (defaultData) {
     dataByLocale[runtimeI18n.defaultLocale] = dataByLocale[runtimeI18n.defaultLocale] || defaultData;
   }

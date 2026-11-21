@@ -11,13 +11,14 @@ import {
   CardPageConfig,
   BlogPageConfig,
 } from '@/types/page';
+import type { MediumArticle } from '@/lib/medium';
 import { useLocaleStore } from '@/lib/stores/localeStore';
 
 export type DynamicPageLocaleData =
   | { type: 'publication'; config: PublicationPageConfig; publications: Publication[] }
   | { type: 'text'; config: TextPageConfig; content: string }
   | { type: 'card'; config: CardPageConfig }
-  | { type: 'blog'; config: BlogPageConfig };
+  | { type: 'blog'; config: BlogPageConfig; articles?: MediumArticle[] };
 
 interface DynamicPageClientProps {
   dataByLocale: Record<string, DynamicPageLocaleData>;
@@ -45,7 +46,7 @@ export default function DynamicPageClient({ dataByLocale, defaultLocale }: Dynam
         <CardPage config={pageData.config} />
       )}
       {pageData.type === 'blog' && (
-        <BlogPage config={pageData.config} />
+        <BlogPage config={pageData.config} initialArticles={pageData.articles} />
       )}
     </div>
   );

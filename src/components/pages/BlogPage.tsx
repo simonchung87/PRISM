@@ -4,21 +4,24 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, RefreshCw } from 'lucide-react';
 import { BlogPageConfig } from '@/types/page';
-
-interface MediumArticle {
-  id: string;
-  title: string;
-  link: string;
-  publishedAt: string;
-  platform: string;
-  categories?: string[];
-}
+import type { MediumArticle } from '@/lib/medium';
 
 function formatArticleDateTime(value: string): string {
   if (!value) return '';
-  const date = new Date(value);
+  const normalized = value.includes(' ') && !value.includes('T') ? value.replace(' ', 'T') + 'Z' : value;
+  const date = new Date(normalized);
   if (Number.isNaN(date.getTime())) {
-    return value;
+    const fallback = new Date(value);
+    if (Number.isNaN(fallback.getTime())) {
+      return value;
+    }
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    }).format(fallback);
   }
 
   return new Intl.DateTimeFormat('en-US', {
@@ -30,55 +33,97 @@ function formatArticleDateTime(value: string): string {
   }).format(date);
 }
 
+interface Rss2JsonItem {
+  guid?: string;
+  title?: string;
+  link?: string;
+  pubDate?: string;
+  categories?: string[];
+}
+
 export default function BlogPage({
   config,
+  initialArticles = [],
   embedded = false,
 }: {
   config: BlogPageConfig;
+  initialArticles?: MediumArticle[];
   embedded?: boolean;
 }) {
   const configuredHandle = (config.medium_username || '').trim().replace(/^@/, '');
   const platformName = config.platform || 'Medium';
   const limit = config.limit || 10;
+  const hasInitialArticles = initialArticles.length > 0;
 
-  const [articles, setArticles] = useState<MediumArticle[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [articles, setArticles] = useState<MediumArticle[]>(initialArticles);
+  const [loading, setLoading] = useState(!hasInitialArticles);
   const [error, setError] = useState<string | null>(null);
 
   const loadArticles = useCallback(async () => {
     if (!configuredHandle) {
-      setArticles([]);
-      setError('No Medium username configured in blog settings.');
+      if (!hasInitialArticles) {
+        setArticles([]);
+        setError('No Medium username configured in blog settings.');
+      }
       setLoading(false);
       return;
     }
 
-    setLoading(true);
+    if (!hasInitialArticles) {
+      setLoading(true);
+    }
     setError(null);
 
     try {
-      const params = new URLSearchParams({
-        username: configuredHandle,
-        platform: platformName,
-        limit: String(limit),
-      });
-      const response = await fetch(`/api/medium/?${params.toString()}`);
+      const rssUrl = `https://medium.com/feed/@${encodeURIComponent(configuredHandle)}`;
+      const response = await fetch(
+        `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
       const data = await response.json();
 
-      if (!response.ok) {
-        setArticles([]);
-        setError(data.error || `Could not load ${platformName} articles for @${configuredHandle}.`);
-        return;
-      }
+      if (data.status === 'ok' && Array.isArray(data.items) && data.items.length > 0) {
+        const mapped: MediumArticle[] = (data.items as Rss2JsonItem[])
+          .slice(0, limit)
+          .map((item, idx) => {
+            const rawLink = item.link || '';
+            const link = rawLink.split('?source=rss')[0] || rawLink;
+            const rawDate = item.pubDate || '';
+            const isoCandidate = rawDate.includes(' ') && !rawDate.includes('T')
+              ? rawDate.replace(' ', 'T') + 'Z'
+              : rawDate;
+            const parsedDate = isoCandidate ? new Date(isoCandidate) : null;
+            return {
+              id: item.guid || link || `medium-${idx}`,
+              title: item.title || 'Untitled Article',
+              link,
+              publishedAt:
+                parsedDate && !Number.isNaN(parsedDate.getTime())
+                  ? parsedDate.toISOString()
+                  : rawDate,
+              platform: platformName,
+              categories: Array.isArray(item.categories) ? item.categories.slice(0, 4) : [],
+            };
+          })
+          .filter((item) => Boolean(item.link));
 
-      setArticles(Array.isArray(data.articles) ? data.articles : []);
+        if (mapped.length > 0) {
+          setArticles(mapped);
+        }
+      } else if (!hasInitialArticles) {
+        setArticles([]);
+      }
     } catch {
-      setArticles([]);
-      setError(`Failed to fetch ${platformName} feed for @${configuredHandle}.`);
+      if (!hasInitialArticles) {
+        setArticles([]);
+        setError(`Failed to fetch ${platformName} feed for @${configuredHandle}.`);
+      }
     } finally {
       setLoading(false);
     }
-  }, [configuredHandle, limit, platformName]);
+  }, [configuredHandle, hasInitialArticles, limit, platformName]);
 
   useEffect(() => {
     loadArticles();

@@ -1,5 +1,3 @@
-import { NextRequest, NextResponse } from 'next/server';
-
 export interface MediumArticle {
   id: string;
   title: string;
@@ -37,7 +35,7 @@ function extractCategories(block: string): string[] {
     .slice(0, 4);
 }
 
-function parseRssItems(xml: string, platform: string, limit: number): MediumArticle[] {
+export function parseMediumRssXml(xml: string, platform: string, limit: number): MediumArticle[] {
   const itemMatches = [...xml.matchAll(/<item\b[^>]*>([\s\S]*?)<\/item>/gi)];
 
   return itemMatches
@@ -69,28 +67,23 @@ function parseRssItems(xml: string, platform: string, limit: number): MediumArti
     .filter((article) => Boolean(article.link));
 }
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const rawUsername = (searchParams.get('username') || '').trim().replace(/^@/, '');
-  const platform = (searchParams.get('platform') || 'Medium').trim() || 'Medium';
-  const rawLimit = Number(searchParams.get('limit') || '10');
-  const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 25) : 10;
+export async function fetchMediumArticles(
+  rawUsername: string,
+  platform = 'Medium',
+  limit = 10
+): Promise<{ articles: MediumArticle[]; error?: string }> {
+  const username = (rawUsername || '').trim().replace(/^@/, '');
+  const resolvedPlatform = (platform || 'Medium').trim() || 'Medium';
+  const resolvedLimit = Number.isFinite(limit) && limit > 0 ? Math.min(limit, 25) : 10;
 
-  if (!rawUsername) {
-    return NextResponse.json(
-      { error: 'Please provide a Medium username.' },
-      { status: 400 }
-    );
+  if (!username || !/^[a-zA-Z0-9._-]+$/.test(username)) {
+    return {
+      articles: [],
+      error: 'Invalid or missing Medium username.',
+    };
   }
 
-  if (!/^[a-zA-Z0-9._-]+$/.test(rawUsername)) {
-    return NextResponse.json(
-      { error: 'Invalid Medium username format.' },
-      { status: 400 }
-    );
-  }
-
-  const feedUrl = `https://medium.com/feed/@${encodeURIComponent(rawUsername)}`;
+  const feedUrl = `https://medium.com/feed/@${encodeURIComponent(username)}`;
 
   try {
     const response = await fetch(feedUrl, {
@@ -98,39 +91,24 @@ export async function GET(req: NextRequest) {
         Accept: 'application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8',
         'User-Agent': 'Mozilla/5.0 (compatible; AcademicPortfolioRSS/1.0)',
       },
-      next: { revalidate: 300 },
+      signal: AbortSignal.timeout(10000),
     });
 
     if (!response.ok) {
-      return NextResponse.json(
-        {
-          error: `Unable to load Medium feed for @${rawUsername} (HTTP ${response.status}).`,
-          username: rawUsername,
-          platform,
-          articles: [],
-        },
-        { status: response.status === 404 ? 404 : 502 }
-      );
+      return {
+        articles: [],
+        error: `Unable to load ${resolvedPlatform} feed for @${username} (HTTP ${response.status}).`,
+      };
     }
 
     const xml = await response.text();
-    const articles = parseRssItems(xml, platform, limit);
-
-    return NextResponse.json({
-      username: rawUsername,
-      platform,
-      articles,
-    });
-  } catch (error) {
-    console.error('Error fetching Medium RSS feed:', error);
-    return NextResponse.json(
-      {
-        error: `Failed to connect to Medium RSS feed for @${rawUsername}.`,
-        username: rawUsername,
-        platform,
-        articles: [],
-      },
-      { status: 502 }
-    );
+    return {
+      articles: parseMediumRssXml(xml, resolvedPlatform, resolvedLimit),
+    };
+  } catch {
+    return {
+      articles: [],
+      error: `Failed to connect to ${resolvedPlatform} RSS feed for @${username}.`,
+    };
   }
 }

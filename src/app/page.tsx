@@ -5,6 +5,7 @@ import HomePageClient, { type HomePageLocaleData } from '@/components/home/HomeP
 import { Publication } from '@/types/publication';
 import { BasePageConfig, PublicationPageConfig, TextPageConfig, CardPageConfig, BlogPageConfig } from '@/types/page';
 import { getRuntimeI18nConfig } from '@/lib/i18n/config';
+import { fetchMediumArticles, type MediumArticle } from '@/lib/medium';
 
 interface SectionConfig {
   id: string;
@@ -28,7 +29,7 @@ type PageData =
   | { type: 'publication'; id: string; config: PublicationPageConfig; publications: Publication[] }
   | { type: 'text'; id: string; config: TextPageConfig; content: string }
   | { type: 'card'; id: string; config: CardPageConfig }
-  | { type: 'blog'; id: string; config: BlogPageConfig };
+  | { type: 'blog'; id: string; config: BlogPageConfig; articles?: MediumArticle[] };
 
 function processSections(sections: SectionConfig[], locale?: string): SectionConfig[] {
   return sections.map((section: SectionConfig) => {
@@ -62,7 +63,7 @@ function processSections(sections: SectionConfig[], locale?: string): SectionCon
   });
 }
 
-function loadPageDataForLocale(locale: string | undefined): HomePageLocaleData {
+async function loadPageDataForLocale(locale: string | undefined): Promise<HomePageLocaleData> {
   const localeConfig = getConfig(locale);
   const enableOnePageMode = localeConfig.features.enable_one_page_mode;
 
@@ -72,9 +73,10 @@ function loadPageDataForLocale(locale: string | undefined): HomePageLocaleData {
   let pagesToShow: PageData[] = [];
 
   if (enableOnePageMode) {
-    pagesToShow = localeConfig.navigation
+    const resolvedPages = await Promise.all(
+      localeConfig.navigation
       .filter((item) => item.type === 'page')
-      .map((item) => {
+      .map(async (item) => {
         const rawConfig = getPageConfig(item.target, locale);
         if (!rawConfig) return null;
 
@@ -118,16 +120,24 @@ function loadPageDataForLocale(locale: string | undefined): HomePageLocaleData {
         }
 
         if (pageConfig.type === 'blog') {
+          const blogConfig = pageConfig as BlogPageConfig;
+          const { articles } = await fetchMediumArticles(
+            blogConfig.medium_username,
+            blogConfig.platform,
+            blogConfig.limit
+          );
           return {
             type: 'blog',
             id: item.target,
-            config: pageConfig as BlogPageConfig,
+            config: blogConfig,
+            articles,
           } as PageData;
         }
 
         return null;
       })
-      .filter((item): item is PageData => item !== null);
+    );
+    pagesToShow = resolvedPages.filter((item): item is PageData => item !== null);
   } else if (aboutConfig) {
     pagesToShow = [{
       type: 'about',
@@ -146,7 +156,7 @@ function loadPageDataForLocale(locale: string | undefined): HomePageLocaleData {
   };
 }
 
-export default function Home() {
+export default async function Home() {
   const baseConfig = getConfig();
   const runtimeI18n = getRuntimeI18nConfig(baseConfig.i18n);
   const targetLocales = runtimeI18n.enabled ? runtimeI18n.locales : [runtimeI18n.defaultLocale];
@@ -154,11 +164,11 @@ export default function Home() {
   const dataByLocale: Record<string, HomePageLocaleData> = {};
 
   for (const locale of targetLocales) {
-    dataByLocale[locale] = loadPageDataForLocale(locale);
+    dataByLocale[locale] = await loadPageDataForLocale(locale);
   }
 
   if (!dataByLocale[runtimeI18n.defaultLocale]) {
-    dataByLocale[runtimeI18n.defaultLocale] = loadPageDataForLocale(undefined);
+    dataByLocale[runtimeI18n.defaultLocale] = await loadPageDataForLocale(undefined);
   }
 
   return <HomePageClient dataByLocale={dataByLocale} defaultLocale={runtimeI18n.defaultLocale} />;

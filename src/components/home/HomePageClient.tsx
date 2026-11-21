@@ -11,6 +11,7 @@ import BlogPage from '@/components/pages/BlogPage';
 import type { SiteConfig } from '@/lib/config';
 import { Publication } from '@/types/publication';
 import { BlogPageConfig, CardPageConfig, PublicationPageConfig, TextPageConfig } from '@/types/page';
+import type { MediumArticle } from '@/lib/medium';
 import { useLocaleStore } from '@/lib/stores/localeStore';
 
 interface SectionConfig {
@@ -30,7 +31,7 @@ type PageData =
   | { type: 'publication'; id: string; config: PublicationPageConfig; publications: Publication[] }
   | { type: 'text'; id: string; config: TextPageConfig; content: string }
   | { type: 'card'; id: string; config: CardPageConfig }
-  | { type: 'blog'; id: string; config: BlogPageConfig };
+  | { type: 'blog'; id: string; config: BlogPageConfig; articles?: MediumArticle[] };
 
 export interface HomePageLocaleData {
   author: SiteConfig['author'];
@@ -124,6 +125,7 @@ export default function HomePageClient({ dataByLocale, defaultLocale }: HomePage
               {page.type === 'blog' && (
                 <BlogPage
                   config={page.config}
+                  initialArticles={page.articles}
                   embedded={true}
                 />
               )}
