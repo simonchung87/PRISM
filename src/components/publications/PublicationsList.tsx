@@ -414,6 +414,12 @@ export default function PublicationsList({ config, publications, embedded = fals
                                                 <FormattedBibTeXText nodes={pub.titleNodes} fallback={pub.title} />
                                             )}
                                         </h3>
+                                        {pub.awards && pub.awards.length > 0 && (
+                                            <div className="mb-2.5 px-3 py-1.5 rounded-lg bg-accent/10 border border-accent/25 text-xs font-medium text-primary inline-flex items-center gap-2">
+                                                <Award className="h-3.5 w-3.5 text-accent shrink-0" aria-hidden="true" />
+                                                <span>{pub.awards.join(' · ')}</span>
+                                            </div>
+                                        )}
                                         <p className={`${embedded ? "text-sm" : "text-base"} text-neutral-600 dark:text-neutral-400 mb-2`}>
                                             {pub.authors.map((author, idx) => (
                                                 <span key={idx}>
@@ -446,20 +452,6 @@ export default function PublicationsList({ config, publications, embedded = fals
                                             </p>
                                         )}
 
-                                        {!pub.presentation && pub.doi && (
-                                            <div className="mb-3 px-3 py-1.5 rounded-md bg-neutral-50 dark:bg-neutral-800/70 border border-neutral-200 text-xs text-neutral-600 flex flex-wrap items-center gap-2">
-                                                <span className="font-semibold text-primary">DOI</span>
-                                                <span className="font-mono select-all break-all">{pub.doi}</span>
-                                            </div>
-                                        )}
-
-                                        {pub.awards && pub.awards.length > 0 && (
-                                            <div className="mb-3 px-3 py-2 rounded-lg bg-accent/10 border border-accent/25 text-xs font-medium text-primary flex items-center gap-2">
-                                                <Award className="h-4 w-4 text-accent shrink-0" aria-hidden="true" />
-                                                <span>{pub.awards.join(' · ')}</span>
-                                            </div>
-                                        )}
-
                                         {pub.description && (
                                             <div className="space-y-2 text-sm text-neutral-600 dark:text-neutral-500 mb-4 line-clamp-3">
                                                 {pub.description.split(/\n{2,}/).map((paragraph, pIdx) => (
@@ -468,7 +460,7 @@ export default function PublicationsList({ config, publications, embedded = fals
                                             </div>
                                         )}
 
-                                        <div className="flex flex-wrap gap-2 mt-auto">
+                                        <div className="flex flex-wrap items-center gap-2 mt-auto">
                                             {pub.pdfUrl && (
                                                 <a
                                                     href={pub.pdfUrl}
@@ -515,6 +507,12 @@ export default function PublicationsList({ config, publications, embedded = fals
                                                     <DocumentTextIcon className="h-3 w-3 mr-1.5" />
                                                     {messages.publications.abstract}
                                                 </button>
+                                            )}
+                                            {!pub.presentation && pub.doi && (
+                                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-neutral-50 dark:bg-neutral-800/70 border border-neutral-200 text-xs text-neutral-600">
+                                                    <span className="font-semibold text-primary">DOI:</span>
+                                                    <span className="font-mono select-all break-all">{pub.doi}</span>
+                                                </div>
                                             )}
                                         </div>
 
