@@ -323,20 +323,20 @@ export default function PublicationsList({ config, publications, embedded = fals
                                             </div>
                                         </div>
                                     )}
-                                    <div className="flex-grow">
+                                    <div className="flex-grow min-w-0">
                                         <h3 className={`${embedded ? "text-lg" : "text-xl"} font-semibold text-primary mb-2 leading-tight`}>
                                             {doiHref ? (
                                                 <a
                                                     href={doiHref}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="group inline-flex items-baseline gap-1.5 hover:text-accent transition-colors"
+                                                    className="group inline hover:text-accent transition-colors"
                                                 >
                                                     <span>
                                                         <FormattedBibTeXText nodes={pub.titleNodes} fallback={pub.title} />
                                                     </span>
                                                     <ExternalLink
-                                                        className="h-3.5 w-3.5 shrink-0 self-center text-neutral-400 group-hover:text-accent transition-colors"
+                                                        className="inline-block align-baseline h-3.5 w-3.5 ml-1.5 text-neutral-400 group-hover:text-accent transition-colors"
                                                         aria-hidden="true"
                                                     />
                                                 </a>
@@ -383,7 +383,7 @@ export default function PublicationsList({ config, publications, embedded = fals
                                         )}
 
                                         {pub.description && (
-                                            <div className="space-y-2 text-sm text-neutral-600 dark:text-neutral-500 mb-4 line-clamp-3">
+                                            <div className="space-y-2 text-sm text-neutral-600 dark:text-neutral-500 mb-4 line-clamp-3 text-justify">
                                                 {pub.description.split(/\n{2,}/).map((paragraph, pIdx) => (
                                                     <p key={pIdx}><LatexText text={paragraph} /></p>
                                                 ))}
@@ -466,7 +466,7 @@ export default function PublicationsList({ config, publications, embedded = fals
                                         >
                                             <div className="liquid-glass-subtle rounded-xl p-4 space-y-3">
                                                 {pub.abstract.split(/\n{2,}/).map((paragraph, pIdx) => (
-                                                    <p key={pIdx} className="text-sm text-neutral-700 leading-relaxed">
+                                                    <p key={pIdx} className="text-sm text-neutral-700 leading-relaxed text-justify">
                                                         <LatexText text={paragraph} />
                                                     </p>
                                                 ))}
