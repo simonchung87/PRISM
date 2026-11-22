@@ -60,6 +60,28 @@ function parseGroup(value: string, index: number): ParseResult | null {
   return parseNodes(value, index + 1, true);
 }
 
+function findClosingDelimiter(value: string, startIndex: number, delimiter: string): number {
+  let index = startIndex;
+
+  while (index < value.length) {
+    if (value[index] === '\\') {
+      if (delimiter !== '$' && delimiter !== '$$' && value.startsWith(delimiter, index)) {
+        return index;
+      }
+      index += 2;
+      continue;
+    }
+
+    if (value.startsWith(delimiter, index)) {
+      return index;
+    }
+
+    index += 1;
+  }
+
+  return -1;
+}
+
 function parseNodes(value: string, startIndex: number, stopAtBrace: boolean): ParseResult {
   const nodes: BibTeXInlineNode[] = [];
   let index = startIndex;
@@ -69,6 +91,42 @@ function parseNodes(value: string, startIndex: number, stopAtBrace: boolean): Pa
 
     if (char === '}' && stopAtBrace) {
       return { nodes, index: index + 1 };
+    }
+
+    if (value.startsWith('$$', index)) {
+      const closeIndex = findClosingDelimiter(value, index + 2, '$$');
+      if (closeIndex !== -1) {
+        pushText(nodes, value.slice(index, closeIndex + 2));
+        index = closeIndex + 2;
+        continue;
+      }
+    }
+
+    if (char === '$') {
+      const closeIndex = findClosingDelimiter(value, index + 1, '$');
+      if (closeIndex !== -1 && !value.slice(index + 1, closeIndex).includes('\n\n')) {
+        pushText(nodes, value.slice(index, closeIndex + 1));
+        index = closeIndex + 1;
+        continue;
+      }
+    }
+
+    if (value.startsWith('\\(', index)) {
+      const closeIndex = findClosingDelimiter(value, index + 2, '\\)');
+      if (closeIndex !== -1) {
+        pushText(nodes, value.slice(index, closeIndex + 2));
+        index = closeIndex + 2;
+        continue;
+      }
+    }
+
+    if (value.startsWith('\\[', index)) {
+      const closeIndex = findClosingDelimiter(value, index + 2, '\\]');
+      if (closeIndex !== -1) {
+        pushText(nodes, value.slice(index, closeIndex + 2));
+        index = closeIndex + 2;
+        continue;
+      }
     }
 
     if (char === '{') {

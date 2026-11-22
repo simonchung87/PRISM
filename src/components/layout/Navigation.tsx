@@ -168,7 +168,7 @@ export default function Navigation({
             className={cn(
               'transition-all duration-300 ease-out',
               scrolled
-                ? 'bg-background/80 backdrop-blur-xl border-b border-neutral-200/50 shadow-lg'
+                ? 'bg-slate-100/35 dark:bg-slate-900/35 backdrop-blur-xl backdrop-saturate-180 border-b border-white/60 dark:border-white/15 shadow-lg'
                 : 'bg-transparent'
             )}
           >
@@ -197,10 +197,10 @@ export default function Navigation({
                       {indicatorStyle && (
                         <motion.div
                           className={cn(
-                            'absolute rounded-lg pointer-events-none',
+                            'absolute rounded-xl pointer-events-none backdrop-blur-md border',
                             hoveredHref && hoveredHref !== activeHref
-                              ? 'bg-accent/[0.07]'
-                              : 'bg-accent/10'
+                              ? 'bg-accent/[0.08] border-accent/15'
+                              : 'bg-accent/[0.14] border-accent/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)]'
                           )}
                           initial={false}
                           animate={{

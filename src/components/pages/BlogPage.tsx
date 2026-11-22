@@ -131,9 +131,9 @@ export default function BlogPage({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.2 }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className={embedded ? 'mb-6' : 'mb-8'}>
         <h1 className={`${embedded ? 'text-2xl' : 'text-4xl'} font-serif font-bold text-primary mb-4`}>
@@ -152,7 +152,7 @@ export default function BlogPage({
           {[0, 1, 2].map((skeleton) => (
             <div
               key={skeleton}
-              className="bg-white dark:bg-neutral-900 p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 animate-pulse"
+              className="liquid-glass p-6 rounded-2xl animate-pulse"
             >
               <div className="h-5 bg-neutral-200 dark:bg-neutral-800 rounded w-3/4 mb-3" />
               <div className="h-4 bg-neutral-100 dark:bg-neutral-800/70 rounded w-1/3" />
@@ -163,12 +163,12 @@ export default function BlogPage({
 
       {/* Error State */}
       {!loading && error && (
-        <div className="p-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 text-center space-y-3">
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">{error}</p>
+        <div className="p-6 rounded-2xl liquid-glass-subtle text-center space-y-3">
+          <p className="text-sm text-neutral-600">{error}</p>
           <button
             type="button"
             onClick={loadArticles}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-primary hover:bg-accent hover:text-white transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium liquid-glass-button text-primary hover:text-accent transition-[border-color,box-shadow,color] cursor-pointer"
           >
             <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
             Retry
@@ -178,7 +178,7 @@ export default function BlogPage({
 
       {/* Empty State */}
       {!loading && !error && articles.length === 0 && (
-        <div className="p-8 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-center text-sm text-neutral-500">
+        <div className="p-8 rounded-2xl liquid-glass-subtle text-center text-sm text-neutral-500">
           No published articles found for @{configuredHandle} on {platformName}.
         </div>
       )}
@@ -186,15 +186,19 @@ export default function BlogPage({
       {/* Articles List */}
       {!loading && !error && articles.length > 0 && (
         <div className="space-y-4">
-          {articles.map((article, index) => {
+          {articles.map((article) => {
             const formattedDate = formatArticleDateTime(article.publishedAt);
             return (
               <motion.article
                 key={article.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: Math.min(0.05 * index, 0.3) }}
-                className="bg-white dark:bg-neutral-900 p-6 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 hover:shadow-md hover:border-accent/40 transition-all duration-200"
+                initial={{ opacity: 0, y: 44, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: false, amount: 0.12 }}
+                transition={{
+                  duration: 1,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                className="liquid-glass p-6 rounded-2xl hover:border-accent/40 transition-[border-color,box-shadow] duration-300"
               >
                 <div className="flex flex-col gap-2.5">
                   <h2 className={`${embedded ? 'text-lg' : 'text-xl'} font-semibold text-primary leading-snug`}>

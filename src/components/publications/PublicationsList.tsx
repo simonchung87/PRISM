@@ -15,6 +15,7 @@ import { PublicationPageConfig } from '@/types/page';
 import { cn } from '@/lib/utils';
 import { useMessages } from '@/lib/i18n/useMessages';
 import FormattedBibTeXText from './FormattedBibTeXText';
+import LatexText from '@/components/ui/LatexText';
 
 interface PublicationsListProps {
     config: PublicationPageConfig;
@@ -114,9 +115,9 @@ export default function PublicationsList({ config, publications, embedded = fals
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
             <div className="mb-8">
                 <h1 className={`${embedded ? "text-2xl" : "text-4xl"} font-serif font-bold text-primary mb-4`}>{config.title}</h1>
@@ -131,7 +132,7 @@ export default function PublicationsList({ config, publications, embedded = fals
             <div className="mb-8 space-y-4">
                 <div className="flex flex-col sm:flex-row gap-3">
                     <div className="relative flex-grow">
-                        <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                        <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400 z-10 pointer-events-none" />
                         <input
                             type="text"
                             placeholder={
@@ -141,23 +142,23 @@ export default function PublicationsList({ config, publications, embedded = fals
                             }
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200"
+                            className="w-full pl-10 pr-4 py-2 rounded-xl liquid-glass-subtle text-primary placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-accent/60 transition-[border-color,box-shadow] duration-200"
                         />
                     </div>
                     {hasPresentations && (
                         <div
                             role="group"
                             aria-label={messages.publications.presentation}
-                            className="inline-flex items-center p-1 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 shrink-0 self-start sm:self-auto"
+                            className="inline-flex items-center p-1 rounded-xl liquid-glass-subtle shrink-0 self-start sm:self-auto"
                         >
                             <button
                                 type="button"
                                 onClick={() => setSelectedPresentation('all')}
                                 className={cn(
-                                    "px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer",
+                                    "px-3 py-1.5 text-xs font-medium rounded-lg transition-[border-color,box-shadow,color] whitespace-nowrap shrink-0 cursor-pointer",
                                     selectedPresentation === 'all'
-                                        ? "bg-accent text-white shadow-sm"
-                                        : "text-neutral-600 dark:text-neutral-400 hover:text-primary"
+                                        ? "liquid-glass-accent shadow-sm"
+                                        : "text-neutral-600 hover:text-primary"
                                 )}
                             >
                                 {messages.common.all}
@@ -168,10 +169,10 @@ export default function PublicationsList({ config, publications, embedded = fals
                                     type="button"
                                     onClick={() => setSelectedPresentation(format)}
                                     className={cn(
-                                        "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer",
+                                        "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-[border-color,box-shadow,color] whitespace-nowrap shrink-0 cursor-pointer",
                                         selectedPresentation === format
-                                            ? "bg-accent text-white shadow-sm"
-                                            : "text-neutral-600 dark:text-neutral-400 hover:text-primary"
+                                            ? "liquid-glass-accent shadow-sm"
+                                            : "text-neutral-600 hover:text-primary"
                                     )}
                                 >
                                     {format === 'oral' ? (
@@ -188,10 +189,10 @@ export default function PublicationsList({ config, publications, embedded = fals
                         type="button"
                         onClick={() => setShowFilters(!showFilters)}
                         className={cn(
-                            "flex items-center justify-center px-4 py-2 rounded-lg border transition-all duration-200 whitespace-nowrap shrink-0 cursor-pointer",
+                            "flex items-center justify-center px-4 py-2 rounded-xl transition-[border-color,box-shadow,color] duration-200 whitespace-nowrap shrink-0 cursor-pointer",
                             showFilters
-                                ? "bg-accent text-white border-accent"
-                                : "bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-600 hover:border-accent hover:text-accent"
+                                ? "liquid-glass-accent"
+                                : "liquid-glass-button text-primary hover:text-accent"
                         )}
                     >
                         <FunnelIcon className="h-5 w-5 mr-2" />
@@ -207,10 +208,10 @@ export default function PublicationsList({ config, publications, embedded = fals
                             exit={{ opacity: 0, height: 0 }}
                             className="overflow-hidden"
                         >
-                            <div className="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-800 flex flex-wrap gap-6">
+                            <div className="p-4 liquid-glass-subtle rounded-2xl flex flex-wrap gap-6">
                                 {/* Year Filter */}
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex items-center">
+                                    <label className="text-sm font-medium text-neutral-700 flex items-center">
                                         <CalendarIcon className="h-4 w-4 mr-1" /> {messages.publications.year}
                                     </label>
                                     <div className="flex flex-wrap gap-2">
@@ -218,10 +219,10 @@ export default function PublicationsList({ config, publications, embedded = fals
                                             type="button"
                                             onClick={() => setSelectedYear('all')}
                                             className={cn(
-                                                "px-3 py-1 text-xs rounded-full transition-colors cursor-pointer",
+                                                "px-3 py-1 text-xs rounded-full transition-[border-color,box-shadow,color] cursor-pointer",
                                                 selectedYear === 'all'
-                                                    ? "bg-accent text-white"
-                                                    : "bg-white dark:bg-neutral-800 text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                                                    ? "liquid-glass-accent"
+                                                    : "liquid-glass-button text-primary"
                                             )}
                                         >
                                             {messages.common.all}
@@ -232,10 +233,10 @@ export default function PublicationsList({ config, publications, embedded = fals
                                                 key={year}
                                                 onClick={() => setSelectedYear(year)}
                                                 className={cn(
-                                                    "px-3 py-1 text-xs rounded-full transition-colors tabular-nums cursor-pointer",
+                                                    "px-3 py-1 text-xs rounded-full transition-[border-color,box-shadow,color] tabular-nums cursor-pointer",
                                                     selectedYear === year
-                                                        ? "bg-accent text-white"
-                                                        : "bg-white dark:bg-neutral-800 text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                                                        ? "liquid-glass-accent"
+                                                        : "liquid-glass-button text-primary"
                                                 )}
                                             >
                                                 {year}
@@ -256,7 +257,7 @@ export default function PublicationsList({ config, publications, embedded = fals
                         {messages.publications.noResults}
                     </div>
                 ) : (
-                    filteredPublications.map((pub, index) => {
+                    filteredPublications.map((pub) => {
                         const venueName = pub.conference || pub.journal;
                         const dateLabel = formatDateLabel(pub.month, pub.year);
                         const doiHref = pub.doi ? `https://doi.org/${pub.doi}` : null;
@@ -264,20 +265,24 @@ export default function PublicationsList({ config, publications, embedded = fals
                         return (
                             <motion.div
                                 key={pub.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.4, delay: 0.1 * index }}
-                                className="bg-white dark:bg-neutral-900 p-6 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-800 hover:shadow-md transition-all duration-200"
+                                initial={{ opacity: 0, y: 44, scale: 0.95 }}
+                                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                                viewport={{ once: false, amount: 0.12 }}
+                                transition={{
+                                    duration: 1,
+                                    ease: [0.22, 1, 0.36, 1],
+                                }}
+                                className="liquid-glass p-6 rounded-2xl transition-[border-color,box-shadow] duration-300"
                             >
                                 {pub.presentation && (
-                                    <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-4 border-b border-neutral-100 dark:border-neutral-800">
+                                    <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-4 border-b border-black/5 dark:border-white/10">
                                         <div className="flex flex-wrap items-center gap-2">
                                             <span
                                                 className={cn(
                                                     "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide whitespace-nowrap shrink-0",
                                                     pub.presentation === 'oral'
-                                                        ? "bg-accent/15 text-accent-dark dark:text-accent border border-accent/30"
-                                                        : "bg-neutral-100 text-primary border border-neutral-200"
+                                                        ? "bg-accent/15 backdrop-blur-md text-accent-dark dark:text-accent border border-accent/30"
+                                                        : "liquid-glass-button text-primary"
                                                 )}
                                             >
                                                 {pub.presentation === 'oral' ? (
@@ -304,16 +309,16 @@ export default function PublicationsList({ config, publications, embedded = fals
                                     </div>
                                 )}
 
-                                <div className="flex flex-col md:flex-row gap-6">
+                                <div className="flex flex-col md:flex-row gap-6 md:items-stretch">
                                     {pub.preview && (
-                                        <div className="w-full md:w-48 flex-shrink-0">
-                                            <div className="aspect-video md:aspect-[4/3] relative rounded-lg overflow-hidden bg-neutral-100 dark:bg-neutral-800">
+                                        <div className="w-full md:w-52 lg:w-56 flex-shrink-0 md:self-stretch">
+                                            <div className="relative w-full aspect-video md:aspect-auto md:h-full md:min-h-[168px] rounded-2xl overflow-hidden preview-edge-fade">
                                                 <Image
                                                     src={`/papers/${pub.preview}`}
                                                     alt={pub.title}
                                                     fill
-                                                    className="object-cover"
-                                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                    className="object-cover rounded-2xl"
+                                                    sizes="(max-width: 768px) 100vw, 224px"
                                                 />
                                             </div>
                                         </div>
@@ -380,7 +385,7 @@ export default function PublicationsList({ config, publications, embedded = fals
                                         {pub.description && (
                                             <div className="space-y-2 text-sm text-neutral-600 dark:text-neutral-500 mb-4 line-clamp-3">
                                                 {pub.description.split(/\n{2,}/).map((paragraph, pIdx) => (
-                                                    <p key={pIdx}>{paragraph}</p>
+                                                    <p key={pIdx}><LatexText text={paragraph} /></p>
                                                 ))}
                                             </div>
                                         )}
@@ -392,7 +397,7 @@ export default function PublicationsList({ config, publications, embedded = fals
                                                     download
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-accent hover:text-white transition-colors"
+                                                    className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium liquid-glass-button text-primary hover:text-accent transition-[border-color,box-shadow,color]"
                                                 >
                                                     <Download className="h-3 w-3 mr-1.5" aria-hidden="true" />
                                                     PDF
@@ -403,7 +408,7 @@ export default function PublicationsList({ config, publications, embedded = fals
                                                     href={pub.url}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-accent hover:text-white transition-colors"
+                                                    className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium liquid-glass-button text-primary hover:text-accent transition-[border-color,box-shadow,color]"
                                                 >
                                                     URL
                                                 </a>
@@ -413,7 +418,7 @@ export default function PublicationsList({ config, publications, embedded = fals
                                                     href={pub.code}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-accent hover:text-white transition-colors"
+                                                    className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium liquid-glass-button text-primary hover:text-accent transition-[border-color,box-shadow,color]"
                                                 >
                                                     {messages.publications.code}
                                                 </a>
@@ -423,10 +428,10 @@ export default function PublicationsList({ config, publications, embedded = fals
                                                     type="button"
                                                     onClick={() => setExpandedAbstractId(expandedAbstractId === pub.id ? null : pub.id)}
                                                     className={cn(
-                                                        "inline-flex items-center px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer",
+                                                        "inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium transition-[border-color,box-shadow,color] cursor-pointer",
                                                         expandedAbstractId === pub.id
-                                                            ? "bg-accent text-white"
-                                                            : "bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-accent hover:text-white"
+                                                            ? "liquid-glass-accent"
+                                                            : "liquid-glass-button text-primary hover:text-accent"
                                                     )}
                                                 >
                                                     <DocumentTextIcon className="h-3 w-3 mr-1.5" />
@@ -434,40 +439,41 @@ export default function PublicationsList({ config, publications, embedded = fals
                                                 </button>
                                             )}
                                             {!pub.presentation && dateLabel && (
-                                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-neutral-50 dark:bg-neutral-800/70 border border-neutral-200 text-xs font-medium text-neutral-600 tabular-nums">
+                                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg liquid-glass-button text-xs font-medium text-neutral-600 tabular-nums">
                                                     <CalendarIcon className="h-3.5 w-3.5 text-neutral-500 shrink-0" aria-hidden="true" />
                                                     <span>{dateLabel}</span>
                                                 </div>
                                             )}
                                             {!pub.presentation && pub.doi && (
-                                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-neutral-50 dark:bg-neutral-800/70 border border-neutral-200 text-xs text-neutral-600">
+                                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg liquid-glass-button text-xs text-neutral-600">
                                                     <span className="font-semibold text-primary">DOI:</span>
                                                     <span className="font-mono select-all break-all">{pub.doi}</span>
                                                 </div>
                                             )}
                                         </div>
 
-                                        <AnimatePresence>
-                                            {expandedAbstractId === pub.id && pub.abstract ? (
-                                                <motion.div
-                                                    key="abstract"
-                                                    initial={{ opacity: 0, height: 0 }}
-                                                    animate={{ opacity: 1, height: 'auto' }}
-                                                    exit={{ opacity: 0, height: 0 }}
-                                                    className="overflow-hidden mt-4"
-                                                >
-                                                    <div className="bg-neutral-50 dark:bg-neutral-800 rounded-lg p-4 border border-neutral-200 dark:border-neutral-700 space-y-3">
-                                                        {pub.abstract.split(/\n{2,}/).map((paragraph, pIdx) => (
-                                                            <p key={pIdx} className="text-sm text-neutral-600 dark:text-neutral-500 leading-relaxed">
-                                                                {paragraph}
-                                                            </p>
-                                                        ))}
-                                                    </div>
-                                                </motion.div>
-                                            ) : null}
-                                        </AnimatePresence>
                                     </div>
                                 </div>
+
+                                <AnimatePresence>
+                                    {expandedAbstractId === pub.id && pub.abstract ? (
+                                        <motion.div
+                                            key="abstract"
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            exit={{ opacity: 0, height: 0 }}
+                                            className="overflow-hidden mt-4"
+                                        >
+                                            <div className="liquid-glass-subtle rounded-xl p-4 space-y-3">
+                                                {pub.abstract.split(/\n{2,}/).map((paragraph, pIdx) => (
+                                                    <p key={pIdx} className="text-sm text-neutral-700 leading-relaxed">
+                                                        <LatexText text={paragraph} />
+                                                    </p>
+                                                ))}
+                                            </div>
+                                        </motion.div>
+                                    ) : null}
+                                </AnimatePresence>
                             </motion.div>
                         );
                     })

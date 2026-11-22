@@ -12,11 +12,11 @@
   pdf = {sample-paper.pdf},
   urldate = {2024-12-02},
   langid = {english},
-  abstract = {The precise time-evolution of quantum systems is a cornerstone of computational physics. This paper investigates the numerical stability of high-order Runge-Kutta (RK) methods when applied to the time-dependent Schrödinger equation. We derive rigorous stability boundaries for symplectic and non-symplectic RK integrators and demonstrate that specific implicit schemes preserve unitarity over extended simulation times.
+  abstract = {The precise time-evolution of quantum systems is a cornerstone of computational physics. This paper investigates the numerical stability of high-order Runge-Kutta (RK) methods with phase-lag order $\alpha$ when applied to the time-dependent Schrödinger equation $i\hbar\partial_t \psi = \hat{H}\psi$. We derive rigorous stability boundaries for symplectic and non-symplectic RK integrators and demonstrate that specific implicit schemes preserve unitarity over extended simulation times.
 
-By analyzing the spectral properties of the Hamiltonian operator, we establish a relationship between the Courant-Friedrichs-Lewy (CFL) condition and the imaginary eigenvalues characteristic of quantum propagators.
+By analyzing the spectral properties of the Hamiltonian operator, we establish a relationship between the Courant-Friedrichs-Lewy (CFL) condition and the imaginary eigenvalues $\lambda_k = i\omega_k$ characteristic of quantum propagators.
 
-Our findings are validated through simulations of wave packet scattering and harmonic oscillator dynamics, showing that our proposed optimized RK coefficients significantly reduce phase error accumulation compared to standard integrators.},
+Our findings are validated through simulations of wave packet scattering and harmonic oscillator dynamics, showing that our proposed optimized RK coefficients significantly reduce phase error accumulation $\Delta\phi \propto \alpha \Delta t^p$ compared to standard integrators.},
   description={A rigorous analysis of numerical stability boundaries for high-order Runge-Kutta integrators in the context of time-dependent quantum mechanics.},
   keywords={Computational Physics, Quantum Dynamics, Numerical Analysis, Runge-Kutta Methods}
 }

@@ -19,8 +19,9 @@ export default function SelectedPublications({ publications, title, enableOnePag
     return (
         <motion.section
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.06 }}
+            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
         >
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-serif font-bold text-primary">{resolvedTitle}</h2>
@@ -33,13 +34,18 @@ export default function SelectedPublications({ publications, title, enableOnePag
                 </Link>
             </div>
             <div className="space-y-4">
-                {publications.map((pub, index) => (
+                {publications.map((pub) => (
                     <motion.div
                         key={pub.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, delay: 0.1 * index }}
-                        className="bg-neutral-50 dark:bg-neutral-800 p-4 rounded-lg shadow-sm border border-neutral-200 dark:border-[rgba(148,163,184,0.24)] hover:shadow-lg transition-all duration-200 hover:scale-[1.02]"
+                        initial={{ opacity: 0, y: 44, scale: 0.95 }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                        whileHover={{ scale: 1.015 }}
+                        viewport={{ once: false, amount: 0.12 }}
+                        transition={{
+                            duration: 1,
+                            ease: [0.22, 1, 0.36, 1],
+                        }}
+                        className="liquid-glass p-4 rounded-2xl transition-[border-color,box-shadow] duration-300"
                     >
                         <h3 className="font-semibold text-primary mb-2 leading-tight">
                             <FormattedBibTeXText nodes={pub.titleNodes} fallback={pub.title} />

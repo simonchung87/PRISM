@@ -1,4 +1,5 @@
 import type { BibTeXInlineNode } from '@/types/publication';
+import LatexText from '@/components/ui/LatexText';
 
 interface FormattedBibTeXTextProps {
   nodes?: BibTeXInlineNode[];
@@ -10,7 +11,7 @@ function renderNodes(nodes: BibTeXInlineNode[], keyPrefix = 'node'): React.React
     const key = `${keyPrefix}-${index}`;
 
     if (node.type === 'text') {
-      return node.text;
+      return <LatexText key={key} text={node.text} />;
     }
 
     const children = renderNodes(node.children, key);
@@ -41,7 +42,7 @@ function renderNodes(nodes: BibTeXInlineNode[], keyPrefix = 'node'): React.React
 
 export default function FormattedBibTeXText({ nodes, fallback }: FormattedBibTeXTextProps) {
   if (!nodes || nodes.length === 0) {
-    return <>{fallback}</>;
+    return <LatexText text={fallback} />;
   }
 
   return <>{renderNodes(nodes)}</>;

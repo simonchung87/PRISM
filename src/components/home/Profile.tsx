@@ -136,7 +136,7 @@ export default function Profile({ author, social, features, researchInterests }:
             </div>
 
             {/* Contact Links */}
-            <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8 relative px-2">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 relative">
                 {socialLinks.map((link) => {
                     const IconComponent = link.icon;
                     if (link.isLocation) {
@@ -173,7 +173,7 @@ export default function Profile({ author, social, features, researchInterests }:
                                             initial={{ opacity: 0, y: 10, scale: 0.8 }}
                                             animate={{ opacity: 1, y: -10, scale: 1 }}
                                             exit={{ opacity: 0, y: -20, scale: 0.8 }}
-                                            className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full bg-neutral-800 text-white px-4 py-3 rounded-lg text-sm font-medium shadow-lg max-w-[calc(100vw-2rem)] sm:max-w-none sm:whitespace-nowrap ${lastClickedTooltip === 'address' ? 'z-20' : 'z-10'
+                                            className={`absolute top-0 left-1/2 transform -translate-x-[35%] -translate-y-full bg-neutral-800 text-white px-4 py-3 rounded-lg text-sm font-medium shadow-lg w-max max-w-[min(22rem,calc(100vw-2rem))] sm:whitespace-nowrap ${lastClickedTooltip === 'address' ? 'z-30' : 'z-20'
                                                 }`}
                                             onMouseEnter={() => {
                                                 if (!isAddressPinned) setShowAddress(true);
@@ -209,7 +209,7 @@ export default function Profile({ author, social, features, researchInterests }:
                                                 </div>
 
                                             </div>
-                                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-neutral-800"></div>
+                                            <div className="absolute top-full left-[35%] transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-neutral-800"></div>
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
@@ -250,7 +250,7 @@ export default function Profile({ author, social, features, researchInterests }:
                                             initial={{ opacity: 0, y: 10, scale: 0.8 }}
                                             animate={{ opacity: 1, y: -10, scale: 1 }}
                                             exit={{ opacity: 0, y: -20, scale: 0.8 }}
-                                            className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full bg-neutral-800 text-white px-4 py-3 rounded-lg text-sm font-medium shadow-lg max-w-[calc(100vw-2rem)] sm:max-w-none sm:whitespace-nowrap ${lastClickedTooltip === 'email' ? 'z-20' : 'z-10'
+                                            className={`absolute top-0 left-1/2 transform -translate-x-[22%] -translate-y-full bg-neutral-800 text-white px-4 py-3 rounded-lg text-sm font-medium shadow-lg w-max max-w-[min(22rem,calc(100vw-2rem))] sm:whitespace-nowrap ${lastClickedTooltip === 'email' ? 'z-30' : 'z-20'
                                                 }`}
                                             onMouseEnter={() => {
                                                 if (!isEmailPinned) setShowEmail(true);
@@ -280,7 +280,7 @@ export default function Profile({ author, social, features, researchInterests }:
                                                     </a>
                                                 </div>
                                             </div>
-                                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-neutral-800"></div>
+                                            <div className="absolute top-full left-[22%] transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-neutral-800"></div>
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
@@ -304,9 +304,9 @@ export default function Profile({ author, social, features, researchInterests }:
 
             {/* Research Interests */}
             {researchInterests && researchInterests.length > 0 && (
-                <div className="bg-neutral-100 dark:bg-neutral-800 rounded-lg p-4 mb-6 hover:shadow-lg transition-all duration-200 hover:scale-[1.02]">
+                <div className="liquid-glass-subtle rounded-2xl p-4 mb-6 transition-all duration-300 hover:scale-[1.02] origin-center">
                     <h3 className="font-semibold text-primary mb-3">{messages.profile.researchInterests}</h3>
-                    <div className="space-y-2 text-sm text-neutral-700 dark:text-neutral-500">
+                    <div className="space-y-2 text-sm text-neutral-700">
                         {researchInterests.map((interest, index) => (
                             <div key={index}>{interest}</div>
                         ))}
@@ -322,9 +322,9 @@ export default function Profile({ author, social, features, researchInterests }:
                             onClick={handleLike}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${hasLiked
-                                ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400'
-                                : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 cursor-pointer'
+                            className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium text-sm transition-[border-color,box-shadow,color] duration-200 ${hasLiked
+                                ? 'bg-red-50/85 dark:bg-red-900/30 backdrop-blur-md border border-red-200/70 dark:border-red-500/30 text-red-600 dark:text-red-400'
+                                : 'liquid-glass-button text-primary hover:text-red-600 dark:hover:text-red-400 cursor-pointer'
                                 }`}
                         >
                             {hasLiked ? (

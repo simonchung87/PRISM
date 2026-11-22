@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
+import AmbientGeometryBackground from '@/components/ui/AmbientGeometryBackground';
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { LocaleProvider } from '@/components/ui/LocaleProvider';
 import { getConfig } from '@/lib/config';
@@ -170,6 +171,7 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <ThemeProvider>
           <LocaleProvider config={runtimeI18n}>
+            <AmbientGeometryBackground />
             <Navigation
               items={config.navigation}
               siteTitle={config.site.title}
@@ -178,14 +180,16 @@ export default function RootLayout({
               itemsByLocale={navigationByLocale}
               siteTitleByLocale={siteTitleByLocale}
             />
-            <main className="min-h-screen pt-16 lg:pt-20">
+            <main className="relative z-10 min-h-screen pt-16 lg:pt-20">
               {children}
             </main>
-            <Footer
-              lastUpdated={config.site.last_updated}
-              lastUpdatedByLocale={lastUpdatedByLocale}
-              defaultLocale={runtimeI18n.defaultLocale}
-            />
+            <div className="relative z-10">
+              <Footer
+                lastUpdated={config.site.last_updated}
+                lastUpdatedByLocale={lastUpdatedByLocale}
+                defaultLocale={runtimeI18n.defaultLocale}
+              />
+            </div>
           </LocaleProvider>
         </ThemeProvider>
       </body>
